@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/javascript">
+        function reload() {
+            window.opener.location = window.opener.location;
+        }
+    </script>
+</head>
+<body onunload="reload();">
+<?php if ($this->auth):?>
+<div class="error">Congratulations, you are logged in! Please close this window.</div>
+<?php else:?>
+<div class="error">Error has occurred. Please close this window and try again.</div>
+<?php endif;?>
+</body>
+</html>
