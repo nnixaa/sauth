@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Authorisation with twitter
+ */
 class SAuth_Provider_Twitter {
     
     /**
