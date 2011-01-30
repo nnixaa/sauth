@@ -10,5 +10,4 @@ class SAuth extends Zend_Auth {
     public function __construct() {
         
     }
-    sxczxc
 }
