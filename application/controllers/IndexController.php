@@ -14,7 +14,7 @@ class IndexController extends Zend_Controller_Action {
             'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
             'userAuthorizationUrl' => 'https://api.twitter.com/oauth/authorize',
             'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
-            'callbackUrl' => 'http://auth.loc/index/auth'
+            'callbackUrl' => 'http://nixa.ath.cx/index/auth'
         );
     }
     
