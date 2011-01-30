@@ -71,7 +71,7 @@ class SAuth_Provider_Twitter {
      */
     public function getAuthId() {
         
-        $id = (int) $this->getTokenParam('user_id');
+        $id = (int) $this->getUserParam('user_id');
         return $id > 0 ? $id : false;
     }
     
@@ -80,7 +80,7 @@ class SAuth_Provider_Twitter {
      * @param string $key
      * @return mixed
      */
-    public function getTokenParam($key = null) {
+    public function getUserParam($key = null) {
         
         $tokenAccess = $this->_getTokenAccess();
         if (!empty($tokenAccess)) {

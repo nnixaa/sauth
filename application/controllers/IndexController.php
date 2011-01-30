@@ -14,7 +14,7 @@ class IndexController extends Zend_Controller_Action {
             'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
             'userAuthorizationUrl' => 'https://api.twitter.com/oauth/authorize',
             'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
-            'callbackUrl' => 'http://nixa.ath.cx/index/auth'
+            'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth'
         );
     }
     
@@ -26,7 +26,7 @@ class IndexController extends Zend_Controller_Action {
         } else {
             $this->view->auth = true;
             $this->view->twitterId = $twitterAuth->getAuthId();
-            $this->view->twitterParam = $twitterAuth->getTokenParam('screen_name');
+            $this->view->twitterParam = $twitterAuth->getUserParam('screen_name');
         }
     }
     
