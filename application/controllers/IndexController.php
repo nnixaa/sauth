@@ -8,37 +8,36 @@ class IndexController extends Zend_Controller_Action {
         
         $this->config = array(
             'requestScheme' => Zend_Oauth::REQUEST_SCHEME_HEADER,
-            'consumerKey' => 'GAgdRjJmORMNtfEQDzoWWw',
-            'consumerSecret' => 'HnwlFxrA60206FNv8TYG1jxjJdHeB24E0tTmBjsDwQ',
-            'version' => '1.0',
-            'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
-            'userAuthorizationUrl' => 'https://api.twitter.com/oauth/authorize',
-            'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
-            'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth'
+            'consumerKey' => '327c9cbf33902ff250f8248519fe09d9',
+            'consumerSecret' => '327c9cbf33902ff250f8248519fe09d9',
+            'version' => '2.0',
+            'requestTokenUrl' => 'https://www.facebook.com/dialog/oauth',
+            'userAuthorizationUrl' => 'https://graph.facebook.com/oauth/authorize',
+            'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
+            'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth',
         );
     }
     
     public function indexAction() {
         
-        $twitterAuth = new SAuth_Provider_Twitter($this->config);
-        if (!$twitterAuth->isAuthorized()) {
+        $facebookAuth = new SAuth_Provider_Facebook($this->config);
+        if (!$facebookAuth->isAuthorized()) {
             $this->view->auth = false;
         } else {
             $this->view->auth = true;
-            $this->view->twitterId = $twitterAuth->getAuthId();
-            $this->view->twitterParam = $twitterAuth->getUserParam('screen_name');
+            $this->view->facebookId = $facebookAuth->getAuthId();
         }
     }
     
     public function authAction() {
-        $twitterAuth = new SAuth_Provider_Twitter($this->config);
-        $this->view->auth = $twitterAuth->auth();
+        $facebookAuth = new SAuth_Provider_Facebook($this->config);
+        $this->view->auth = $facebookAuth->auth();
     }
     
     public function logoutAction() {
         $this->_helper->viewRenderer->setNoRender();
-        $twitterAuth = new SAuth_Provider_Twitter($this->config);
-        $twitterAuth->clearAuth();
+        $facebookAuth = new SAuth_Provider_Facebook($this->config);
+        $facebookAuth->clearAuth();
         $this->getResponse()->setRedirect('/');
     }
 

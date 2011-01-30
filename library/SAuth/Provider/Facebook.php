@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Authorisation with twitter
+ * Authorisation with facebook
  */
-class SAuth_Provider_Twitter {
+class SAuth_Provider_Facebook {
     
     /**
      * @var array Configuration array
@@ -13,11 +13,11 @@ class SAuth_Provider_Twitter {
         'apiKey' => '',
         'consumerKey' => '',
         'consumerSecret' => '',
-        'version' => '1.0',
-        'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
-        'userAuthorizationUrl' => 'https://api.twitter.com/oauth/authorize',
-        'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
-        'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth',
+        'version' => '2.0',
+        'requestTokenUrl' => 'http://www.facebook.com/dialog/oauth',
+        'userAuthorizationUrl' => 'https://graph.facebook.com/oauth/authorize',
+        'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
+        'callbackUrl' => '',
     );
     
     /**
@@ -33,7 +33,7 @@ class SAuth_Provider_Twitter {
     /**
      * @var string Session key
      */
-    protected $_sessionKey = 'SAUTH_TWITTER';
+    protected $_sessionKey = 'SAUTH_FACEBOOK';
     
     /**
      * @var Zend_Session_Namespace Session storage
@@ -94,7 +94,7 @@ class SAuth_Provider_Twitter {
     }
     
     /**
-     * Authorized user by twitter OAuth
+     * Authorized user by facebook OAuth
      * @param array $config
      * @return true
      */
@@ -116,7 +116,10 @@ class SAuth_Provider_Twitter {
         } else {
             $tokenRequest = $consumer->getRequestToken();
             $this->_setTokenRequest($tokenRequest);
-            $consumer->redirect();
+            $consumer->redirect(array(
+                    'client_id' => '184454904920383',
+                    'redirect_uri' => 'http://dnixa.tmweb.ru/index/auth/',
+                ));
         }
     }
     
