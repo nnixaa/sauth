@@ -10,15 +10,19 @@
             window.open('/index/auth/by/' + by, 'Auth', 'height=600,width=600,status=no,toolbar=no,menubar=no,location=no, resizable=no');
         }
 	</script>
+	<style type="text/css">
+	   a, img {border: none;}
+	</style>
 </head>
 <body>
 	<?php if (!$this->isAuth):?>
-	   <a href="#" onclick="login('google');return false;">Login with Google</a>
-	   <a href="#" onclick="login('twitter');return false;">Login with Twitter</a>
+	   <h1>Login via:</h1>
+	   <a href="#" onclick="login('google');return false;"><img src="/img/google.png" /></a>
+	   <a href="#" onclick="login('twitter');return false;"><img src="/img/twitter.png" /></a>
 	<?php else:?>
 	   <a href="/index/logout" onclick="">Logout</a>
-	   <div>ID: <?php echo $this->id;?></div>
-	   <div>Login: <?php echo $this->login;?></div>
+	   <div><strong>ID:</strong> <?php echo $this->id;?></div>
+	   <div><strong>Login:</strong> <?php echo $this->login;?></div>
 	<?php endif;?>
 </body>
 </html>
