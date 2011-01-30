@@ -9,6 +9,12 @@ class IndexController extends Zend_Controller_Action {
         $this->config['google'] = array(
             'id' => 'https://www.google.com/accounts/o8/id',
             'callbackUrl' => '/index/auth',
+            'exchangeExtension' => array(
+                'openid.ns.ax' => 'http://openid.net/srv/ax/1.0',
+                'openid.ax.mode' => 'fetch_request',
+                'openid.ax.type.email' => 'http://axschema.org/contact/email',
+                'openid.ax.required' => 'email',
+            ),
         );
         
         $this->config['twitter'] = array(
@@ -19,7 +25,7 @@ class IndexController extends Zend_Controller_Action {
             'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
             'userAuthorizationUrl' => 'https://api.twitter.com/oauth/authorize',
             'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
-            'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth'
+            'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth',
         );
     }
     
@@ -31,9 +37,12 @@ class IndexController extends Zend_Controller_Action {
             $this->view->isAuth = true;
             if ($googleAuth->isAuthorized()) {
                 $this->view->id = $googleAuth->getAuthId();
+                $this->view->login = $googleAuth->getUserParam('openid_ext1_value_email');
+                
             }
             if ($twitterAuth->isAuthorized()) {
                 $this->view->id = $twitterAuth->getAuthId();
+                $this->view->login = $twitterAuth->getUserParam('screen_name');
             }
         } else {
             $this->view->isAuth = false;
