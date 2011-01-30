@@ -7,38 +7,27 @@ class IndexController extends Zend_Controller_Action {
     public function init() {
         
         $this->config = array(
-            'requestScheme' => Zend_Oauth::REQUEST_SCHEME_HEADER,
-            'consumerKey' => 'GAgdRjJmORMNtfEQDzoWWw',
-            'consumerSecret' => 'HnwlFxrA60206FNv8TYG1jxjJdHeB24E0tTmBjsDwQ',
-            'version' => '1.0',
-            'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
-            'userAuthorizationUrl' => 'https://api.twitter.com/oauth/authorize',
-            'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
-            'callbackUrl' => 'http://auth.loc/index/auth',
-        );
+            'callbackUrl'       => 'http://kurapov.name',
+            'siteUrl'           => 'https://www.google.com/accounts/',
+            'authorizeUrl'      => 'https://www.google.com/accounts/OAuthAuthorizeToken',
+            'requestTokenUrl'  => 'https://www.google.com/accounts/OAuthGetRequestToken',
+            'accessTokenUrl'    => 'https://www.google.com/accounts/OAuthGetAccessToken',
+            'consumerKey'       => 'dnixa.tmweb.ru',
+            'consumerSecret'    => 'fZfydAcVoEZUw+AaPKqMDG59',
+            'scope' => 'http://www-opensocial.googleusercontent.com/api/people/',
+         );
     }
     
     public function indexAction() {
         
-        $twitterAuth = new SAuth_Provider_Twitter($this->config);
-        if (!$twitterAuth->isAuthorized()) {
-            $this->view->auth = false;
-        } else {
-            $this->view->auth = true;
-            $this->view->twitterId = $twitterAuth->getAuthId();
-            $this->view->twitterParam = $twitterAuth->getTokenParam('screen_name');
-        }
     }
     
     public function authAction() {
-        $twitterAuth = new SAuth_Provider_Twitter($this->config);
-        $this->view->auth = $twitterAuth->auth();
+        $consumer = new Zend_Oauth_Consumer($this->config);
     }
     
     public function logoutAction() {
         $this->_helper->viewRenderer->setNoRender();
-        $twitterAuth = new SAuth_Provider_Twitter($this->config);
-        $twitterAuth->clearAuth();
         $this->getResponse()->setRedirect('/');
     }
 
