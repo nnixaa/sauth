@@ -6,21 +6,10 @@ class IndexController extends Zend_Controller_Action {
     
     public function init() {
         
-        $this->config = array(
-            'id' => 'https://www.google.com/accounts/o8/id',
-            'callbackUrl' => '/index/auth',
-         );
+        $this->config = array();
     }
     
     public function indexAction() {
-        
-        $googleAuth = new SAuth_Provider_Google($this->config);
-        if (!$googleAuth->isAuthorized()) {
-            $this->view->auth = false;
-        } else {
-            $this->view->auth = true;
-            $this->view->googleId = $googleAuth->getAuthId();
-        }
     }
     
     public function authAction() {
