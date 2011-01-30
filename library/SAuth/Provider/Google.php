@@ -94,7 +94,7 @@ class SAuth_Provider_Google {
         $googleExt = new SAuth_Provider_Google_Extension();
         
         if (is_array($config['exchangeExtension']) && !empty($config['exchangeExtension'])) {
-            $googleExt->setParam($config['exchangeExtension']);
+            $googleExt->setParams($config['exchangeExtension']);
         }
         if (!isset($_GET['openid_mode']) || empty($_GET['openid_mode'])) {
             $consumer->login($config['id'], $config['callbackUrl'], $config['root'], $googleExt);
