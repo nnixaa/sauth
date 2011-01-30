@@ -5,16 +5,19 @@
 	<meta name="google-site-verification" content="ulechw5XJLBdsR0-4CvLMjRr3KXOT0jyLZNTEhzE80U" />
 	<title></title>
 	<script type="text/javascript">
-        function click() {
-            window.open('/index/auth', 'Auth', 'height=600,width=600,status=no,toolbar=no,menubar=no,location=no, resizable=no');
+        function login(by) {
+            by =  by || 'google';
+            window.open('/index/auth/by/' + by, 'Auth', 'height=600,width=600,status=no,toolbar=no,menubar=no,location=no, resizable=no');
         }
 	</script>
 </head>
 <body>
-	<?php if (!$this->auth):?>
-	   <a href="#" onclick="click();return false;">Login</a>
+	<?php if (!$this->isAuth):?>
+	   <a href="#" onclick="login('google');return false;">Login with Google</a>
+	   <a href="#" onclick="login('twitter');return false;">Login with Twitter</a>
 	<?php else:?>
 	   <a href="/index/logout" onclick="">Logout</a>
+	   ID: <?php echo $this->id;?> 
 	<?php endif;?>
 </body>
 </html>
