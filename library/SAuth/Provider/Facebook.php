@@ -9,15 +9,12 @@ class SAuth_Provider_Facebook {
      * @var array Configuration array
      */
     protected $_config = array(
-        'requestScheme' => '',
-        'apiKey' => '',
         'consumerKey' => '',
         'consumerSecret' => '',
-        'version' => '2.0',
         'requestTokenUrl' => 'http://www.facebook.com/dialog/oauth',
-        'userAuthorizationUrl' => 'https://graph.facebook.com/oauth/authorize',
         'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-        'callbackUrl' => '',
+        'clientId' => '184454904920383',
+        'redirectUri' => 'http://dnixa.tmweb.ru/index/auth/',
     );
     
     /**
@@ -94,32 +91,35 @@ class SAuth_Provider_Facebook {
     }
     
     /**
-     * Authorized user by facebook OAuth
+     * Authorized user by facebook OAuth 2.0
      * @param array $config
      * @return true
      */
     public function auth(array $config = array()) {
         
         $config = $this->setConfig($config);
-        $consumer = new Zend_Oauth_Consumer($config);
-        $tokenRequest = $this->_getTokenRequest();
-        if (!empty($tokenRequest) && !empty ($_GET)) {
-            $tokenAccess = $consumer->getAccessToken($_GET, $tokenRequest);
-            $httpResponse = $tokenAccess->getResponse();
-            if ($httpResponse->isSuccessful()) {
-                $this->_setTokenAccess($tokenAccess);
-                $this->_unsetTokenRequest();
-                return $this->isAuthorized();
-            } else {
-                return false;
-            }
+        $consumer = new Zend_Http_Client();
+        
+        if (isset($_GET['code'])) {
+            $code = $_GET['code'];
+        
+            $consumer->setUri($config['accessTokenUrl']);
+            $array = array(
+                'client_id' => $config['clientId'],
+                'redirect_uri' => $config['redirectUri'],
+                'client_secret' => $config['consumerSecret'],
+                'code' => $code,
+                'scope' => 'email',
+            );
+            $consumer->setParameterPost($array);
+            $response = $consumer->request(Zend_Http_Client::POST);
+            $this->_setTokenAccess(Zend_Json::decode($response->getBody()));
+            var_dump($response->getBody());
+            return true;
         } else {
-            $tokenRequest = $consumer->getRequestToken();
-            $this->_setTokenRequest($tokenRequest);
-            $consumer->redirect(array(
-                    'client_id' => '184454904920383',
-                    'redirect_uri' => 'http://dnixa.tmweb.ru/index/auth/',
-                ));
+            $url = $config['requestTokenUrl'] . '?';
+            $url .= http_build_query(array('client_id' => $config['clientId'], 'redirect_uri' => $config['redirectUri'], 'scope' => 'email'), null, '&');
+            header('Location: '.$url);
         }
     }
     

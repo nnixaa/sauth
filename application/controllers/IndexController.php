@@ -9,7 +9,7 @@ class IndexController extends Zend_Controller_Action {
         $this->config = array(
             'requestScheme' => Zend_Oauth::REQUEST_SCHEME_HEADER,
             'consumerKey' => '327c9cbf33902ff250f8248519fe09d9',
-            'consumerSecret' => '327c9cbf33902ff250f8248519fe09d9',
+            'consumerSecret' => '4b5ebef60169f606d6a3763df3173b23',
             'version' => '2.0',
             'requestTokenUrl' => 'https://www.facebook.com/dialog/oauth',
             'userAuthorizationUrl' => 'https://graph.facebook.com/oauth/authorize',
