@@ -110,9 +110,9 @@ class SAuth_Provider_Facebook {
                 $this->_setTokenAccess($parsedResponse['access_token']);
                 //try to get user data
                 if ($userParameters = $this->requestUserParams()) {
-                    $this->setUserParams($userParameters);
+                    $this->setUserParameters($userParameters);
                 }
-                return true;
+                return $this->isAuthorized();
             }
         } else {
             
@@ -137,7 +137,7 @@ class SAuth_Provider_Facebook {
      */
     public function getAuthId() {
         
-        $id = (int) $this->getUserParam('id');
+        $id = (int) $this->getUserParameters('id');
         return $id > 0 ? $id : false;
     }
     
@@ -147,7 +147,7 @@ class SAuth_Provider_Facebook {
      * @param string $key
      * @return mixed
      */
-    public function getUserParam($key = null) {
+    public function getUserParameters($key = null) {
         
         $sessionStorage = $this->getSessionStorage();
         $userParameters = (array) $sessionStorage->userParameters;
@@ -164,8 +164,10 @@ class SAuth_Provider_Facebook {
     
     /**
      * Setting user parameters in session
+     * @param array $userParameters
+     * @return array
      */
-    public function setUserParams(array $userParameters) {
+    public function setUserParameters(array $userParameters) {
         $sessionStorage = $this->getSessionStorage();
         return $sessionStorage->userParameters = $userParameters;
     }
