@@ -229,7 +229,7 @@ class SAuth_Provider_Vkontakte {
      * @param string $body
      * @return array
      */
-    protected function _parseRespone($body) {
+    protected function _parseResponse($body) {
         if (is_string($body) && !empty($body)) {
             $body = trim($body);
             $pairs = explode('&', $body);
