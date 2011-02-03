@@ -86,7 +86,7 @@ class SAuth_Provider_Twitter {
                 }
                 return false;
             } elseif ($response->isSuccessful()) {
-                $parsedResponse = $this->_parseRespone($response->getBody());
+                $parsedResponse = $this->_parseResponse($response->getBody());
                 $this->_setTokenAccess($parsedResponse['oauth_token']);
                 $this->setUserParameters($parsedResponse);
                 $this->_unsetTokenRequest();
@@ -257,20 +257,20 @@ class SAuth_Provider_Twitter {
         return $this->_sessionLiveTime;
     }
     
-   /**
-    * Parse twitter accessToken response
-    * @param string $body
-    * @return array
-    */
-    protected function _parseRespone($body) {
+    /**
+     * Parse url
+     * @param string $body
+     * @return array
+     */
+    protected function _parseResponse($body) {
         if (is_string($body) && !empty($body)) {
             $body = trim($body);
-            $pares = explode('&', $body);
+            $pairs = explode('&', $body);
             $parsed = array();
-            if (is_array($pares)) {
-                foreach ($pares as $pareStr) {
-                    $pare = explode('=', $pareStr);
-                    $parsed[$pare[0]] = $pare[1];
+            if (is_array($pairs)) {
+                foreach ($pairs as $pair) {
+                    list($key, $value) = explode('=', $pair);
+                    $parsed[$key] = $value;
                 }
             }
             return $parsed;
