@@ -55,11 +55,11 @@ class IndexController extends Zend_Controller_Action {
             }
             if ($twitterAuth->isAuthorized()) {
                 $this->view->id = $twitterAuth->getAuthId();
-                $this->view->login = $twitterAuth->getUserParam('screen_name');
+                $this->view->login = $twitterAuth->getUserParameters('screen_name');
             }
             if ($facebookAuth->isAuthorized()) {
                 $this->view->id = $facebookAuth->getAuthId();
-                $this->view->login = $facebookAuth->getUserParam('email');
+                $this->view->login = $facebookAuth->getUserParameters('email');
             }
         } else {
             $this->view->isAuth = false;
