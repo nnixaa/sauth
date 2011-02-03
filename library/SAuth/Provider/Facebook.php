@@ -11,21 +11,11 @@ class SAuth_Provider_Facebook {
     protected $_config = array(
         'consumerKey' => '',
         'consumerSecret' => '',
-        'requestTokenUrl' => 'http://www.facebook.com/dialog/oauth',
+        'clientId' => '',
+        'redirectUri' => '',
+        'userAuthorizationUrl' => 'http://www.facebook.com/dialog/oauth',
         'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-        'clientId' => '184454904920383',
-        'redirectUri' => 'http://dnixa.tmweb.ru/index/auth/',
     );
-    
-    /**
-     * @var bool Auth flag
-     */
-    protected $_isAuthorized = false;
-    
-    /**
-     * @var int Authentication identification
-     */
-    protected $_id = null;
     
     /**
      * @var string Session key
@@ -98,28 +88,57 @@ class SAuth_Provider_Facebook {
     public function auth(array $config = array()) {
         
         $config = $this->setConfig($config);
-        $consumer = new Zend_Http_Client();
         
-        if (isset($_GET['code'])) {
-            $code = $_GET['code'];
+        $authorizationUrl = $config['userAuthorizationUrl'];
+        $accessTokenUrl = $config['accessTokenUrl'];
+        $clientId = $config['clientId'];
+        $clientSecret = $config['consumerSecret'];
+        $redirectUrl = $config['redirectUri'];
+        if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) || empty($accessTokenUrl)) {
+            throw new SAuth_Exception('Facebook auth configuration not specifed.');
+        }
         
-            $consumer->setUri($config['accessTokenUrl']);
-            $array = array(
-                'client_id' => $config['clientId'],
-                'redirect_uri' => $config['redirectUri'],
-                'client_secret' => $config['consumerSecret'],
-                'code' => $code,
-                'scope' => 'email',
+        if (isset($_GET['code']) && !empty($_GET['code'])) {
+            	
+            $authorizationCode = trim($_GET['code']);
+            $accessConfig = array(
+                'client_id' => $clientId,
+                'redirect_uri' => $redirectUrl,
+                'client_secret' => $clientSecret,
+                'code' => $authorizationCode,
             );
-            $consumer->setParameterPost($array);
-            $response = $consumer->request(Zend_Http_Client::POST);
-            $this->_setTokenAccess(Zend_Json::decode($response->getBody()));
-            var_dump($response->getBody());
-            return true;
+            $client = new Zend_Http_Client();
+            $client->setUri($accessTokenUrl);
+            $client->setParameterPost($accessConfig);
+            $response = $client->request(Zend_Http_Client::POST);
+            
+            if ($response->isError()) {
+                //facebook return 400 http code on error
+                switch  ($response->getStatus()) {
+                    case '400':
+                        $jsonError = Zend_Json::decode($response->getBody());
+                        $error = $jsonError['message'];
+                        break;
+                    default:
+                        $error = 'OAuth service unavailable.';
+                        break;
+                }
+                return false;
+            } elseif ($response->isSuccessful()) {
+                //TODO: try to get user data
+                $this->_setTokenAccess($response->getBody());
+                return true;
+            }
         } else {
-            $url = $config['requestTokenUrl'] . '?';
-            $url .= http_build_query(array('client_id' => $config['clientId'], 'redirect_uri' => $config['redirectUri'], 'scope' => 'email'), null, '&');
-            header('Location: '.$url);
+            
+            $authorizationConfig = array(
+                'client_id' => $clientId, 
+                'redirect_uri' => $redirectUrl,
+            );
+            $url = $authorizationUrl . '?';
+            $url .= http_build_query($authorizationConfig, null, '&');
+            header('Location: ' . $url);
+            exit(1);
         }
     }
     
@@ -138,7 +157,7 @@ class SAuth_Provider_Facebook {
         
         $sessionKey = (string) $this->getSessionKey();
         if (empty($sessionKey)) {
-            throw new SAuth_Exception('Invalid twitter auth storage key');
+            throw new SAuth_Exception('Invalid facebook auth storage key');
         }
         $this->_sessionStorage = new Zend_Session_Namespace($sessionKey);
         $this->_sessionStorage->setExpirationSeconds($this->getSessionLiveTime());

@@ -7,14 +7,12 @@ class IndexController extends Zend_Controller_Action {
     public function init() {
         
         $this->config = array(
-            'requestScheme' => Zend_Oauth::REQUEST_SCHEME_HEADER,
             'consumerKey' => '327c9cbf33902ff250f8248519fe09d9',
             'consumerSecret' => '4b5ebef60169f606d6a3763df3173b23',
-            'version' => '2.0',
-            'requestTokenUrl' => 'https://www.facebook.com/dialog/oauth',
-            'userAuthorizationUrl' => 'https://graph.facebook.com/oauth/authorize',
+            'clientId' => '184454904920383',
+            'userAuthorizationUrl' => 'https://www.facebook.com/dialog/oauth',
             'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-            'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth',
+            'redirectUri' => 'http://dnixa.tmweb.ru/index/auth',
         );
     }
     
@@ -25,7 +23,7 @@ class IndexController extends Zend_Controller_Action {
             $this->view->auth = false;
         } else {
             $this->view->auth = true;
-            $this->view->facebookId = $facebookAuth->getAuthId();
+            //$this->view->facebookId = $facebookAuth->getAuthId();
         }
     }
     
