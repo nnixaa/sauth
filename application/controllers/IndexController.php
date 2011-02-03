@@ -26,7 +26,7 @@ class IndexController extends Zend_Controller_Action {
         } else {
             $this->view->auth = true;
             $this->view->twitterId = $twitterAuth->getAuthId();
-            $this->view->twitterParam = $twitterAuth->getUserParam('screen_name');
+            $this->view->twitterParam = $twitterAuth->getUserParameters('screen_name');
         }
     }
     

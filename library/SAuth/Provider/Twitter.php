@@ -9,8 +9,7 @@ class SAuth_Provider_Twitter {
      * @var array Configuration array
      */
     protected $_config = array(
-        'requestScheme' => '',
-        'apiKey' => '',
+        'requestScheme' => Zend_Oauth::REQUEST_SCHEME_HEADER,
         'consumerKey' => '',
         'consumerSecret' => '',
         'version' => '1.0',
@@ -19,16 +18,6 @@ class SAuth_Provider_Twitter {
         'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
         'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth',
     );
-    
-    /**
-     * @var bool Auth flag
-     */
-    protected $_isAuthorized = false;
-    
-    /**
-     * @var int Authentication identification
-     */
-    protected $_id = null;
     
     /**
      * @var string Session key
@@ -66,34 +55,6 @@ class SAuth_Provider_Twitter {
     }
     
     /**
-     * Getting authentication identification
-     * @return false|int User ID
-     */
-    public function getAuthId() {
-        
-        $id = (int) $this->getUserParam('user_id');
-        return $id > 0 ? $id : false;
-    }
-    
-    /**
-     * Returns token params
-     * @param string $key
-     * @return mixed
-     */
-    public function getUserParam($key = null) {
-        
-        $tokenAccess = $this->_getTokenAccess();
-        if (!empty($tokenAccess)) {
-            
-            if ($key != null) {
-                $key = (string) $key;
-                return $tokenAccess->getParam($key);
-            }
-        }
-        return false;
-    }
-    
-    /**
      * Authorized user by twitter OAuth
      * @param array $config
      * @return true
@@ -101,24 +62,86 @@ class SAuth_Provider_Twitter {
     public function auth(array $config = array()) {
         
         $config = $this->setConfig($config);
+        if (empty($config['consumerKey']) || empty($config['consumerSecret']) || empty($config['userAuthorizationUrl']) 
+            || empty($config['accessTokenUrl']) || empty($config['callbackUrl'])) {
+                
+            throw new SAuth_Exception('Twitter auth configuration not specifed.');
+        }
+        
         $consumer = new Zend_Oauth_Consumer($config);
         $tokenRequest = $this->_getTokenRequest();
+        
         if (!empty($tokenRequest) && !empty ($_GET)) {
             $tokenAccess = $consumer->getAccessToken($_GET, $tokenRequest);
-            $httpResponse = $tokenAccess->getResponse();
-            if ($httpResponse->isSuccessful()) {
-                $this->_setTokenAccess($tokenAccess);
+            $response = $tokenAccess->getResponse();
+            
+            if ($response->isError()) {
+                switch  ($response->getStatus()) {
+                    case '400':
+                        $error = 'Error has occurred.';
+                        break;
+                    default:
+                        $error = 'OAuth service unavailable.';
+                        break;
+                }
+                return false;
+            } elseif ($response->isSuccessful()) {
+                $parsedResponse = $this->_parseRespone($response->getBody());
+                $this->_setTokenAccess($parsedResponse['oauth_token']);
+                $this->setUserParameters($parsedResponse);
                 $this->_unsetTokenRequest();
                 return $this->isAuthorized();
-            } else {
-                return false;
             }
+            return false;
+            
         } else {
             $tokenRequest = $consumer->getRequestToken();
             $this->_setTokenRequest($tokenRequest);
             $consumer->redirect();
         }
     }
+
+    /**
+     * Getting authentication identification
+     * @return false|int User ID
+     */
+    public function getAuthId() {
+        
+        $id = (int) $this->getUserParameters('user_id');
+        return $id > 0 ? $id : false;
+    }
+    
+    /**
+     * TODO: Cant select multi-level arrays
+     * Returns user parameters
+     * @param string $key
+     * @return mixed
+     */
+    public function getUserParameters($key = null) {
+        
+        $sessionStorage = $this->getSessionStorage();
+        $userParameters = (array) $sessionStorage->userParameters;
+        
+        if (!empty($userParameters)) {
+            
+            if ($key != null) {
+                $key = (string) $key;
+                return $userParameters[$key];
+            }
+        }
+        return $userParameters;
+    }
+    
+    /**
+     * Setting user parameters in session
+     * @param array $userParameters
+     * @return array
+     */
+    public function setUserParameters(array $userParameters) {
+        $sessionStorage = $this->getSessionStorage();
+        return $sessionStorage->userParameters = $userParameters;
+    }
+    
     
     /**
      * Clear saved access token
@@ -232,6 +255,27 @@ class SAuth_Provider_Twitter {
     public function getSessionLiveTime() {
 
         return $this->_sessionLiveTime;
+    }
+    
+   /**
+    * Parse twitter accessToken response
+    * @param string $body
+    * @return array
+    */
+    protected function _parseRespone($body) {
+        if (is_string($body) && !empty($body)) {
+            $body = trim($body);
+            $pares = explode('&', $body);
+            $parsed = array();
+            if (is_array($pares)) {
+                foreach ($pares as $pareStr) {
+                    $pare = explode('=', $pareStr);
+                    $parsed[$pare[0]] = $pare[1];
+                }
+            }
+            return $parsed;
+        }
+        return false;
     }
     
     /**
