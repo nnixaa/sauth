@@ -1,28 +1,21 @@
 <?php
 
 /**
- * Authorisation with facebook
+ * Authorisation with vkontakte
  */
-class SAuth_Provider_Facebook {
+class SAuth_Provider_Vkontakte {
     
     /**
      * @var array Configuration array
      */
     protected $_config = array(
-        'consumerKey' => '',
-        'consumerSecret' => '',
-        'clientId' => '',
-        'redirectUri' => '',
-        'userAuthorizationUrl' => 'http://www.facebook.com/dialog/oauth',
-        'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-        'graphUrl' => 'https://graph.facebook.com',
-        'scope' => null,
+        'apiId' => '',
     );
     
     /**
      * @var string Session key
      */
-    protected $_sessionKey = 'SAUTH_FACEBOOK';
+    protected $_sessionKey = 'SAUTH_VKONTAKTE';
     
     /**
      * @var Zend_Session_Namespace Session storage
@@ -55,7 +48,7 @@ class SAuth_Provider_Facebook {
     }
     
     /**
-     * Authorized user by facebook OAuth 2.0
+     * Authorized user
      * @param array $config
      * @return true
      */
@@ -63,71 +56,16 @@ class SAuth_Provider_Facebook {
         
         $config = $this->setConfig($config);
         
-        $authorizationUrl = $config['userAuthorizationUrl'];
-        $accessTokenUrl = $config['accessTokenUrl'];
-        $clientId = $config['clientId'];
-        $clientSecret = $config['consumerSecret'];
-        $redirectUrl = $config['redirectUri'];
+        $apiId = $config['apiId'];
         
-        if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) || empty($accessTokenUrl)) {
-            throw new SAuth_Exception('Facebook auth configuration not specifed.');
-        }
-        if (isset($config['scope']) && !empty($config['scope'])) {
-            $scope = $config['scope'];
+        if (empty($apiId)) {
+            throw new SAuth_Exception('Vkontakte auth configuration not specifed.');
         }
         
-        if (isset($_GET['code']) && !empty($_GET['code'])) {
-            	
-            $authorizationCode = trim($_GET['code']);
-            $accessConfig = array(
-                'client_id' => $clientId,
-                'redirect_uri' => $redirectUrl,
-                'client_secret' => $clientSecret,
-                'code' => $authorizationCode,
-                'scope' => implode($scope, ','),
-            );
-            
-            $client = new Zend_Http_Client();
-            $client->setUri($accessTokenUrl);
-            $client->setParameterPost($accessConfig);
-            $response = $client->request(Zend_Http_Client::POST);
-            
-            if ($response->isError()) {
-                //facebook return 400 http code on error
-                switch  ($response->getStatus()) {
-                    case '400':
-                        $jsonError = Zend_Json::decode($response->getBody());
-                        $error = $jsonError['error']['message'];
-                        break;
-                    default:
-                        $error = 'OAuth service unavailable.';
-                        break;
-                }
-                return false;
-            } elseif ($response->isSuccessful()) {
-                
-                $parsedResponse = $this->_parseRespone($response->getBody());
-                $this->_setTokenAccess($parsedResponse['access_token']);
-                //try to get user data
-                if ($userParameters = $this->requestUserParams()) {
-                    $this->setUserParameters($userParameters);
-                }
+        if (true) {
                 return $this->isAuthorized();
-            }
         } else {
             
-            $authorizationConfig = array(
-                'client_id' => $clientId, 
-                'redirect_uri' => $redirectUrl,
-            );
-            if (isset($scope)) {
-                $authorizationConfig['scope'] = implode($scope, ',');
-            }
-            // TODO: maybe http_build_url ?
-            $url = $authorizationUrl . '?';
-            $url .= http_build_query($authorizationConfig, null, '&');
-            header('Location: ' . $url);
-            exit(1);
         }
     }
     
@@ -171,32 +109,7 @@ class SAuth_Provider_Facebook {
         $sessionStorage = $this->getSessionStorage();
         return $sessionStorage->userParameters = $userParameters;
     }
-    
-    /**
-     * Request user params on facebook using Graph API
-     * @return array User params
-     */
-    public function requestUserParams() {
         
-        $graphUrl = $this->getConfig('graphUrl');
-        $accessToken = $this->_getTokenAccess();
-
-        if ($accessToken && !empty($graphUrl)) {
-            $client = new Zend_Http_Client();
-            $url = $graphUrl . '/me';
-            $client->setUri($url);
-            $client->setParameterGET(array('access_token' => $accessToken));
-            $response = $client->request(Zend_Http_Client::GET);
-            if ($response->isError()) {
-                $error = 'Request user parameters failed.';
-                return false;
-            } elseif ($response->isSuccessful()) {
-                return $userParams = Zend_Json::decode($response->getBody());
-            }
-        }
-        return false;
-    }
-    
     /**
      * Clear saved access token
      */
@@ -312,19 +225,19 @@ class SAuth_Provider_Facebook {
     }
     
     /**
-     * Parse facebook accessToken response
+     * Parse url
      * @param string $body
      * @return array
      */
     protected function _parseRespone($body) {
         if (is_string($body) && !empty($body)) {
             $body = trim($body);
-            $pares = explode('&', $body);
+            $pairs = explode('&', $body);
             $parsed = array();
-            if (is_array($pares)) {
-                foreach ($pares as $pareStr) {
-                    $pare = explode('=', $pareStr);
-                    $parsed[$pare[0]] = $pare[1];
+            if (is_array($pairs)) {
+                foreach ($pairs as $pair) {
+                    list($key, $value) = explode('=', $pair);
+                    $parsed[$key] = $value;
                 }
             }
             return $parsed;
