@@ -13,6 +13,9 @@ class IndexController extends Zend_Controller_Action {
             'userAuthorizationUrl' => 'https://www.facebook.com/dialog/oauth',
             'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
             'redirectUri' => 'http://dnixa.tmweb.ru/index/auth',
+            'scope' => array(
+                 'user_about_me', 'user_activities',
+            ),
         );
     }
     
@@ -23,7 +26,7 @@ class IndexController extends Zend_Controller_Action {
             $this->view->auth = false;
         } else {
             $this->view->auth = true;
-            //$this->view->facebookId = $facebookAuth->getAuthId();
+            $this->view->facebookId = $facebookAuth->getAuthId();
         }
     }
     

@@ -15,6 +15,8 @@ class SAuth_Provider_Facebook {
         'redirectUri' => '',
         'userAuthorizationUrl' => 'http://www.facebook.com/dialog/oauth',
         'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
+        'graphUrl' => 'https://graph.facebook.com',
+        'scope' => null,
     );
     
     /**
@@ -53,34 +55,6 @@ class SAuth_Provider_Facebook {
     }
     
     /**
-     * Getting authentication identification
-     * @return false|int User ID
-     */
-    public function getAuthId() {
-        
-        $id = (int) $this->getUserParam('user_id');
-        return $id > 0 ? $id : false;
-    }
-    
-    /**
-     * Returns token params
-     * @param string $key
-     * @return mixed
-     */
-    public function getUserParam($key = null) {
-        
-        $tokenAccess = $this->_getTokenAccess();
-        if (!empty($tokenAccess)) {
-            
-            if ($key != null) {
-                $key = (string) $key;
-                return $tokenAccess->getParam($key);
-            }
-        }
-        return false;
-    }
-    
-    /**
      * Authorized user by facebook OAuth 2.0
      * @param array $config
      * @return true
@@ -94,8 +68,12 @@ class SAuth_Provider_Facebook {
         $clientId = $config['clientId'];
         $clientSecret = $config['consumerSecret'];
         $redirectUrl = $config['redirectUri'];
+        
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) || empty($accessTokenUrl)) {
             throw new SAuth_Exception('Facebook auth configuration not specifed.');
+        }
+        if (isset($config['scope']) && !empty($config['scope'])) {
+            $scope = $config['scope'];
         }
         
         if (isset($_GET['code']) && !empty($_GET['code'])) {
@@ -106,7 +84,9 @@ class SAuth_Provider_Facebook {
                 'redirect_uri' => $redirectUrl,
                 'client_secret' => $clientSecret,
                 'code' => $authorizationCode,
+                'scope' => implode($scope, ','),
             );
+            
             $client = new Zend_Http_Client();
             $client->setUri($accessTokenUrl);
             $client->setParameterPost($accessConfig);
@@ -117,7 +97,7 @@ class SAuth_Provider_Facebook {
                 switch  ($response->getStatus()) {
                     case '400':
                         $jsonError = Zend_Json::decode($response->getBody());
-                        $error = $jsonError['message'];
+                        $error = $jsonError['error']['message'];
                         break;
                     default:
                         $error = 'OAuth service unavailable.';
@@ -125,8 +105,13 @@ class SAuth_Provider_Facebook {
                 }
                 return false;
             } elseif ($response->isSuccessful()) {
-                //TODO: try to get user data
-                $this->_setTokenAccess($response->getBody());
+                
+                $parsedResponse = $this->_parseRespone($response->getBody());
+                $this->_setTokenAccess($parsedResponse['access_token']);
+                //try to get user data
+                if ($userParameters = $this->requestUserParams()) {
+                    $this->setUserParams($userParameters);
+                }
                 return true;
             }
         } else {
@@ -135,11 +120,79 @@ class SAuth_Provider_Facebook {
                 'client_id' => $clientId, 
                 'redirect_uri' => $redirectUrl,
             );
+            if (isset($scope)) {
+                $authorizationConfig['scope'] = implode($scope, ',');
+            }
+            // TODO: maybe http_build_url ?
             $url = $authorizationUrl . '?';
             $url .= http_build_query($authorizationConfig, null, '&');
             header('Location: ' . $url);
             exit(1);
         }
+    }
+    
+    /**
+     * Getting authentication identification
+     * @return false|int User ID
+     */
+    public function getAuthId() {
+        
+        $id = (int) $this->getUserParam('id');
+        return $id > 0 ? $id : false;
+    }
+    
+    /**
+     * TODO: Cant select multi-level arrays
+     * Returns user parameters
+     * @param string $key
+     * @return mixed
+     */
+    public function getUserParam($key = null) {
+        
+        $sessionStorage = $this->getSessionStorage();
+        $userParameters = (array) $sessionStorage->userParameters;
+        
+        if (!empty($userParameters)) {
+            
+            if ($key != null) {
+                $key = (string) $key;
+                return $userParameters[$key];
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Setting user parameters in session
+     */
+    public function setUserParams(array $userParameters) {
+        $sessionStorage = $this->getSessionStorage();
+        return $sessionStorage->userParameters = $userParameters;
+    }
+    
+    /**
+     * Request user params on facebook using Graph API
+     * @return array User params
+     */
+    public function requestUserParams() {
+        
+        $graphUrl = $this->getConfig('graphUrl');
+        $accessToken = $this->_getTokenAccess();
+
+        if ($accessToken && !empty($graphUrl)) {
+            $client = new Zend_Http_Client();
+            $url = $graphUrl . '/me';
+            $client->setUri($url);
+            $client->setParameterGET(array('access_token' => $accessToken));
+            $response = $client->request(Zend_Http_Client::GET);
+            if ($response->isError()) {
+                $error = 'Request user parameters failed.';
+                return false;
+            } elseif ($response->isSuccessful()) {
+                return $userParams = Zend_Json::decode($response->getBody());
+            }
+        }
+        return false;
     }
     
     /**
@@ -254,6 +307,27 @@ class SAuth_Provider_Facebook {
     public function getSessionLiveTime() {
 
         return $this->_sessionLiveTime;
+    }
+    
+    /**
+     * Parse facebook accessToken response
+     * @param string $body
+     * @return array
+     */
+    protected function _parseRespone($body) {
+        if (is_string($body) && !empty($body)) {
+            $body = trim($body);
+            $pares = explode('&', $body);
+            $parsed = array();
+            if (is_array($pares)) {
+                foreach ($pares as $pareStr) {
+                    $pare = explode('=', $pareStr);
+                    $parsed[$pare[0]] = $pare[1];
+                }
+            }
+            return $parsed;
+        }
+        return false;
     }
     
     /**
