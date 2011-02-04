@@ -36,7 +36,7 @@ class IndexController extends Zend_Controller_Action {
             'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
             'redirectUri' => 'http://dnixa.tmweb.ru/index/auth',
             'scope' => array(
-                 'user_about_me', 'user_activities',
+                 'user_about_me', 'email',
             ),
         );
     }
