@@ -159,7 +159,7 @@ class SAuth_Provider_Facebook {
                 return $userParameters[$key];
             }
         }
-        return false;
+        return $userParameters;
     }
     
     /**
