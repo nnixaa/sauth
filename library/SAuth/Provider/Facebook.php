@@ -106,7 +106,7 @@ class SAuth_Provider_Facebook {
                 return false;
             } elseif ($response->isSuccessful()) {
                 
-                $parsedResponse = $this->_parseRespone($response->getBody());
+                $parsedResponse = $this->_parseResponse($response->getBody());
                 $this->_setTokenAccess($parsedResponse['access_token']);
                 //try to get user data
                 if ($userParameters = $this->requestUserParams()) {
@@ -159,7 +159,7 @@ class SAuth_Provider_Facebook {
                 return $userParameters[$key];
             }
         }
-        return false;
+        return $userParameters;
     }
     
     /**
@@ -312,19 +312,19 @@ class SAuth_Provider_Facebook {
     }
     
     /**
-     * Parse facebook accessToken response
+     * Parse url
      * @param string $body
      * @return array
      */
-    protected function _parseRespone($body) {
+    protected function _parseResponse($body) {
         if (is_string($body) && !empty($body)) {
             $body = trim($body);
-            $pares = explode('&', $body);
+            $pairs = explode('&', $body);
             $parsed = array();
-            if (is_array($pares)) {
-                foreach ($pares as $pareStr) {
-                    $pare = explode('=', $pareStr);
-                    $parsed[$pare[0]] = $pare[1];
+            if (is_array($pairs)) {
+                foreach ($pairs as $pair) {
+                    list($key, $value) = explode('=', $pair);
+                    $parsed[$key] = $value;
                 }
             }
             return $parsed;
