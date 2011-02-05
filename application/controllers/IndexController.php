@@ -46,6 +46,15 @@ class IndexController extends Zend_Controller_Action {
             'redirectUrl' => 'http://dnixa.tmweb.ru',
             'userAuthorizationUrl' => 'http://dnixa.tmweb.ru/index/auth/by/vkontakte',
         );
+        
+        $this->config['mailru'] = array(
+            'consumerSecret' => '3a2381491f9dc192048ef286e6072d2c',
+            'privateKey' => 'd2eaa0a682c17da8afd94377c1f55e6c',
+            'clientId' => '586934',
+            'userAuthorizationUrl' => 'https://connect.mail.ru/oauth/authorize',
+            'accessTokenUrl' => 'https://connect.mail.ru/oauth/token',
+            'redirectUri' => 'http://dnixa.tmweb.ru/index/auth/by/mailru',
+        );
     }
     
     public function indexAction() {
@@ -54,11 +63,13 @@ class IndexController extends Zend_Controller_Action {
         $twitterAuth = new SAuth_Provider_Twitter($this->config['twitter']);
         $facebookAuth = new SAuth_Provider_Facebook($this->config['facebook']);
         $vkontakteAuth = new SAuth_Provider_Vkontakte($this->config['vkontakte']);
+        $mailruAuth = new SAuth_Provider_Mailru($this->config['mailru']);
+        
         $this->view->vkAppId = $this->config['vkontakte']['apiId'];
         $this->view->vkAuthUrl = $this->config['vkontakte']['userAuthorizationUrl'];
         
         if ($googleAuth->isAuthorized() || $twitterAuth->isAuthorized() || $facebookAuth->isAuthorized()
-            || $vkontakteAuth->isAuthorized() ) {
+            || $vkontakteAuth->isAuthorized() || $mailruAuth->isAuthorized()) {
                 
             $this->view->isAuth = true;
             if ($googleAuth->isAuthorized()) {
@@ -77,6 +88,10 @@ class IndexController extends Zend_Controller_Action {
             if ($vkontakteAuth->isAuthorized()) {
                 $this->view->id = $vkontakteAuth->getAuthId();
                 $this->view->login = $vkontakteAuth->getUserParameters('first_name');
+            }
+            if ($mailruAuth->isAuthorized()) {
+                $this->view->id = $mailruAuth->getAuthId();
+                $this->view->login = $mailruAuth->getUserParameters('email');
             }
         } else {
             $this->view->isAuth = false;
@@ -103,6 +118,10 @@ class IndexController extends Zend_Controller_Action {
                 $vkontakteAuth = new SAuth_Provider_Vkontakte($this->config['vkontakte']);
                 $this->view->auth = $vkontakteAuth->auth();
                 break;
+            case 'mailru':
+                $mailruAuth = new SAuth_Provider_Mailru($this->config['mailru']);
+                $this->view->auth = $mailruAuth->auth();
+                break;
         }
     }
     
@@ -118,6 +137,8 @@ class IndexController extends Zend_Controller_Action {
         $facebookAuth->clearAuth();
         $vkontakteAuth = new SAuth_Provider_Vkontakte($this->config['vkontakte']);
         $vkontakteAuth->clearAuth();
+        $mailruAuth = new SAuth_Provider_Mailru($this->config['mailru']);
+        $mailruAuth->clearAuth();
         $this->getResponse()->setRedirect('/');
     }
 
