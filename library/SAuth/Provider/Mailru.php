@@ -177,6 +177,10 @@ class SAuth_Provider_Mailru {
      */
     public function requestUserParams() {
         
+        if (!$this->isAuthorized()) {
+            return false;
+        }
+        
         $restUrl = $this->getConfig('restUrl');
         $accessToken = $this->_getTokenAccess();
         $config = $this->getConfig();
