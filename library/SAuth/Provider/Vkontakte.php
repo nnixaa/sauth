@@ -10,6 +10,8 @@ class SAuth_Provider_Vkontakte {
      */
     protected $_config = array(
         'apiId' => '',
+        'apiSecret' => '',
+        'redirectUrl' => '',
     );
     
     /**
@@ -54,19 +56,40 @@ class SAuth_Provider_Vkontakte {
      */
     public function auth(array $config = array()) {
         
+        if ($this->isAuthorized()) {
+            return true;
+        }
+        
         $config = $this->setConfig($config);
         
         $apiId = $config['apiId'];
+        $apiSecret = $config['apiSecret'];
         
-        if (empty($apiId)) {
+        if (empty($apiId) || empty($apiId)) {
             throw new SAuth_Exception('Vkontakte auth configuration not specifed.');
         }
-        
-        if (true) {
+        $appCookie = isset($_COOKIE['vk_app_' . $apiId]) ? $this->_parseResponse($_COOKIE['vk_app_' . $apiId]) : null;
+        $vkUserCookie = isset($_COOKIE['vk_user_info_' . $apiId]) ? $this->_parseResponse($_COOKIE['vk_user_info_' . $apiId]) : null;
+        if (!empty($appCookie)) {
+            //create sign
+            $sign = 'expire=' . $appCookie['expire'] . 'mid=' . $appCookie['mid'] . 'secret=' . $appCookie['secret']
+                . 'sid=' . $appCookie['sid'];
+            $sign =  md5($sign . $apiSecret);
+            if ($appCookie['sig'] == $sign) {
+                $this->_setTokenAccess($sign);
+                $this->setUserParameters($appCookie);
+                $this->setUserParameters($vkUserCookie);
+                //unset vk info cookie
+                setcookie('vk_user_info_' . $apiId, '', time()-1000, '/');
+                
+                if (!empty($config['redirectUrl'])) {
+                    header('Location:' . $config['redirectUrl']);
+                    exit(1);
+                }
                 return $this->isAuthorized();
-        } else {
-            
+            }
         }
+        return false;
     }
     
     /**
@@ -94,7 +117,7 @@ class SAuth_Provider_Vkontakte {
             
             if ($key != null) {
                 $key = (string) $key;
-                return $userParameters[$key];
+                return isset($userParameters[$key]) ? $userParameters[$key] : false;
             }
         }
         return false;
@@ -106,8 +129,13 @@ class SAuth_Provider_Vkontakte {
      * @return array
      */
     public function setUserParameters(array $userParameters) {
+            
+        $params = $this->getUserParameters();
+        foreach ($userParameters as $key => $value) {
+            $params[$key] = $value;
+        }
         $sessionStorage = $this->getSessionStorage();
-        return $sessionStorage->userParameters = $userParameters;
+        return $sessionStorage->userParameters = $params;
     }
         
     /**
@@ -236,8 +264,12 @@ class SAuth_Provider_Vkontakte {
             $parsed = array();
             if (is_array($pairs)) {
                 foreach ($pairs as $pair) {
-                    list($key, $value) = explode('=', $pair);
-                    $parsed[$key] = $value;
+                    if (!empty($pair)) {
+                        list($key, $value) = explode('=', $pair, 2);
+                        if (!empty($key) && !empty($value)) {
+                            $parsed[$key] = $value;
+                        }
+                    }
                 }
             }
             return $parsed;

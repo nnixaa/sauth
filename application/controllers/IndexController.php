@@ -8,17 +8,21 @@ class IndexController extends Zend_Controller_Action {
         
         $this->config = array(
             'apiId' => '2157310',
+            'apiSecret' => 'ABGeZmiYE46jWvRaeJuD',
+            'redirectUrl' => 'http://dnixa.tmweb.ru',
         );
     }
     
     public function indexAction() {
+        
+        $this->view->appId = $this->config['apiId'];
         
         $vkontakteAuth = new SAuth_Provider_Vkontakte($this->config);
         if (!$vkontakteAuth->isAuthorized()) {
             $this->view->auth = false;
         } else {
             $this->view->auth = true;
-            $this->view->facebookId = $vkontakteAuth->getAuthId();
+            $this->view->vkontakteId = $vkontakteAuth->getAuthId();
         }
     }
     

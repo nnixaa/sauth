@@ -3,9 +3,30 @@
 <head>
 	<meta charset="UTF-8">
 	<title></title>
+	<script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        VK.init({
+            apiId: <?php echo $this->appId;?>
+        });
+    </script>
 	<script type="text/javascript">
         function click() {
-            window.open('/index/auth', 'Auth', 'height=600,width=600,status=no,toolbar=no,menubar=no,location=no, resizable=no');
+            VK.Auth.login(function(response) {
+                if (response.session) {
+                    var exdate = new Date();
+                    exdate.setMinutes(exdate.getMinutes() + 10);
+                    var user = response.session.user;
+                    var cookie = 'vk_user_info_' + <?php echo $this->appId;?> +'=';
+                    for (key in user) {
+                        cookie += key + '=' + escape(user[key]) + '&';
+                    }
+                    cookie += '; expires=' + exdate.toUTCString();
+                    document.cookie = cookie;
+                    document.location = '/index/auth/';
+                } else {
+                }
+            });
+
         }
 	</script>
 </head>
@@ -15,6 +36,6 @@
 	<?php else:?>
 	   <a href="/index/logout" onclick="">Logout</a>
 	<?php endif;?>
-	<?php Zend_Debug::dump($this->facebookId);?>
+	<?php Zend_Debug::dump($this->vkontakteId);?>
 </body>
 </html>
