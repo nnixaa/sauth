@@ -77,8 +77,8 @@ class SAuth_Provider_Vkontakte {
             $sign =  md5($sign . $apiSecret);
             if ($appCookie['sig'] == $sign) {
                 $this->_setTokenAccess($sign);
-                $this->setUserParameters($appCookie);
-                $this->setUserParameters($vkUserCookie);
+                $this->setUserParameters((array) $appCookie);
+                $this->setUserParameters((array) $vkUserCookie);
                 //unset vk info cookie
                 setcookie('vk_user_info_' . $apiId, '', time()-1000, '/');
                 
