@@ -61,6 +61,10 @@ class SAuth_Provider_Twitter {
      */
     public function auth(array $config = array()) {
         
+        if ($this->isAuthorized()) {
+            return true;
+        }
+        
         $config = $this->setConfig($config);
         if (empty($config['consumerKey']) || empty($config['consumerSecret']) || empty($config['userAuthorizationUrl']) 
             || empty($config['accessTokenUrl']) || empty($config['callbackUrl'])) {
@@ -126,7 +130,7 @@ class SAuth_Provider_Twitter {
             
             if ($key != null) {
                 $key = (string) $key;
-                return $userParameters[$key];
+                return isset($userParameters[$key]) ? $userParameters[$key] : false;
             }
         }
         return $userParameters;
@@ -138,8 +142,12 @@ class SAuth_Provider_Twitter {
      * @return array
      */
     public function setUserParameters(array $userParameters) {
+        $params = $this->getUserParameters();
+        foreach ($userParameters as $key => $value) {
+            $params[$key] = $value;
+        }
         $sessionStorage = $this->getSessionStorage();
-        return $sessionStorage->userParameters = $userParameters;
+        return $sessionStorage->userParameters = $params;
     }
     
     
@@ -207,7 +215,7 @@ class SAuth_Provider_Twitter {
             
         $key = (string) $key;
         if ($key != null && isset($this->_config[$key])) {
-            return $this->_config[$key];
+            return isset($this->_config[$key]) ? $this->_config[$key] : false;
         }
         return $this->_config;
     }
