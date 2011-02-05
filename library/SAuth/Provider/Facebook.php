@@ -183,6 +183,10 @@ class SAuth_Provider_Facebook {
      */
     public function requestUserParams() {
         
+        if (!$this->isAuthorized()) {
+            return false;
+        }
+        
         $graphUrl = $this->getConfig('graphUrl');
         $accessToken = $this->_getTokenAccess();
 
