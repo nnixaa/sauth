@@ -156,7 +156,7 @@ class SAuth_Provider_Facebook {
             
             if ($key != null) {
                 $key = (string) $key;
-                return $userParameters[$key];
+                return isset($userParameters[$key]) ? $userParameters[$key] : false;
             }
         }
         return $userParameters;
@@ -168,8 +168,13 @@ class SAuth_Provider_Facebook {
      * @return array
      */
     public function setUserParameters(array $userParameters) {
+
+        $params = $this->getUserParameters();
+        foreach ($userParameters as $key => $value) {
+            $params[$key] = $value;
+        }
         $sessionStorage = $this->getSessionStorage();
-        return $sessionStorage->userParameters = $userParameters;
+        return $sessionStorage->userParameters = $params;
     }
     
     /**
@@ -185,8 +190,8 @@ class SAuth_Provider_Facebook {
             $client = new Zend_Http_Client();
             $url = $graphUrl . '/me';
             $client->setUri($url);
-            $client->setParameterGET(array('access_token' => $accessToken));
-            $response = $client->request(Zend_Http_Client::GET);
+            $client->setParameterPOST(array('access_token' => $accessToken));
+            $response = $client->request(Zend_Http_Client::POST);
             if ($response->isError()) {
                 $error = 'Request user parameters failed.';
                 return false;
@@ -337,16 +342,6 @@ class SAuth_Provider_Facebook {
     }
     
     /**
-     * Trying get token request from session storage
-     * @return false|string
-     */
-    protected function _getTokenRequest() {
-        
-        $sessionStorage = $this->getSessionStorage();
-        return !empty($sessionStorage->tokenRequest) ? unserialize($sessionStorage->tokenRequest) : false;
-    }
-
-    /**
      * Trying get token access from session storage
      * @return false|string
      */
@@ -354,17 +349,6 @@ class SAuth_Provider_Facebook {
         
         $sessionStorage = $this->getSessionStorage();
         return !empty($sessionStorage->tokenAccess) ? unserialize($sessionStorage->tokenAccess) : false;
-    }
-
-    /**
-     * Setting token request from session storage
-     * @param string $tokenRequest
-     * @return string
-     */
-    protected function _setTokenRequest($tokenRequest) {
-        
-        $sessionStorage = $this->getSessionStorage();
-        return $sessionStorage->tokenRequest = serialize($tokenRequest);
     }
 
     /**
@@ -376,15 +360,6 @@ class SAuth_Provider_Facebook {
         
         $sessionStorage = $this->getSessionStorage();
         return $sessionStorage->tokenAccess = serialize($tokenAccess);
-    }
-
-    /**
-     * Unset token request from session storage
-     */
-    protected function _unsetTokenRequest() {
-        
-        $sessionStorage->tokenRequest = null;
-        unset($sessionStorage->tokenRequest);
     }
 
     /**
