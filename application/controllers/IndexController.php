@@ -74,7 +74,7 @@ class IndexController extends Zend_Controller_Action {
             $this->view->isAuth = true;
             if ($googleAuth->isAuthorized()) {
                 $this->view->id = $googleAuth->getAuthId();
-                $this->view->login = $googleAuth->getUserParam('openid_ext1_value_email');
+                $this->view->login = $googleAuth->getUserParameters('openid_ext1_value_email');
                 
             }
             if ($twitterAuth->isAuthorized()) {
