@@ -55,6 +55,14 @@ class IndexController extends Zend_Controller_Action {
             'accessTokenUrl' => 'https://connect.mail.ru/oauth/token',
             'redirectUri' => 'http://dnixa.tmweb.ru/index/auth/by/mailru',
         );
+        
+        $this->config['foursquare'] = array(
+            'consumerSecret' => '5TMLM0TY3AXFZI1CQHPBDCWZJ0RQZDBKUAGQHHLHJE1I43I2',
+            'clientId' => '5THSZIOOWVTDJNGB0I3LPWVJYQ4QILZZSVCT2Q3G3FTQDUQ3',
+            'userAuthorizationUrl' => 'https://foursquare.com/oauth2/authorize',
+            'accessTokenUrl' => 'https://foursquare.com/oauth2/access_token',
+            'redirectUri' => 'http://dnixa.tmweb.ru/index/auth/by/foursquare',
+        );
     }
     
     public function indexAction() {
@@ -64,12 +72,13 @@ class IndexController extends Zend_Controller_Action {
         $facebookAuth = new SAuth_Provider_Facebook($this->config['facebook']);
         $vkontakteAuth = new SAuth_Provider_Vkontakte($this->config['vkontakte']);
         $mailruAuth = new SAuth_Provider_Mailru($this->config['mailru']);
+        $foursquareAuth = new SAuth_Provider_Foursquare($this->config['foursquare']);
         
         $this->view->vkAppId = $this->config['vkontakte']['apiId'];
         $this->view->vkAuthUrl = $this->config['vkontakte']['userAuthorizationUrl'];
         
         if ($googleAuth->isAuthorized() || $twitterAuth->isAuthorized() || $facebookAuth->isAuthorized()
-            || $vkontakteAuth->isAuthorized() || $mailruAuth->isAuthorized()) {
+            || $vkontakteAuth->isAuthorized() || $mailruAuth->isAuthorized() || $foursquareAuth->isAuthorized()) {
                 
             $this->view->isAuth = true;
             if ($googleAuth->isAuthorized()) {
@@ -92,6 +101,10 @@ class IndexController extends Zend_Controller_Action {
             if ($mailruAuth->isAuthorized()) {
                 $this->view->id = $mailruAuth->getAuthId();
                 $this->view->login = $mailruAuth->getUserParameters('email');
+            }
+            if ($foursquareAuth->isAuthorized()) {
+                $this->view->id = $foursquareAuth->getAuthId();
+                $this->view->login = $foursquareAuth->getUserParameters('firstName');
             }
         } else {
             $this->view->isAuth = false;
@@ -122,6 +135,10 @@ class IndexController extends Zend_Controller_Action {
                 $mailruAuth = new SAuth_Provider_Mailru($this->config['mailru']);
                 $this->view->auth = $mailruAuth->auth();
                 break;
+            case 'foursquare':
+                $foursquareAuth = new SAuth_Provider_Foursquare($this->config['foursquare']);
+                $this->view->auth = $foursquareAuth->auth();
+                break;
         }
     }
     
@@ -139,6 +156,8 @@ class IndexController extends Zend_Controller_Action {
         $vkontakteAuth->clearAuth();
         $mailruAuth = new SAuth_Provider_Mailru($this->config['mailru']);
         $mailruAuth->clearAuth();
+        $foursquareAuth = new SAuth_Provider_Foursquare($this->config['foursquare']);
+        $foursquareAuth->clearAuth();
         $this->getResponse()->setRedirect('/');
     }
 
