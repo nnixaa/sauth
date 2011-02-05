@@ -202,7 +202,7 @@ class SAuth_Provider_Vkontakte {
             
         $key = (string) $key;
         if ($key != null && isset($this->_config[$key])) {
-            return $this->_config[$key];
+            return isset($this->_config[$key]) ? $this->_config[$key] : false;
         }
         return $this->_config;
     }
@@ -276,16 +276,6 @@ class SAuth_Provider_Vkontakte {
         }
         return false;
     }
-    
-    /**
-     * Trying get token request from session storage
-     * @return false|string
-     */
-    protected function _getTokenRequest() {
-        
-        $sessionStorage = $this->getSessionStorage();
-        return !empty($sessionStorage->tokenRequest) ? unserialize($sessionStorage->tokenRequest) : false;
-    }
 
     /**
      * Trying get token access from session storage
@@ -298,17 +288,6 @@ class SAuth_Provider_Vkontakte {
     }
 
     /**
-     * Setting token request from session storage
-     * @param string $tokenRequest
-     * @return string
-     */
-    protected function _setTokenRequest($tokenRequest) {
-        
-        $sessionStorage = $this->getSessionStorage();
-        return $sessionStorage->tokenRequest = serialize($tokenRequest);
-    }
-
-    /**
      * Seting token access from session storage
      * @param string $tokenAccess
      * @return string
@@ -317,15 +296,6 @@ class SAuth_Provider_Vkontakte {
         
         $sessionStorage = $this->getSessionStorage();
         return $sessionStorage->tokenAccess = serialize($tokenAccess);
-    }
-
-    /**
-     * Unset token request from session storage
-     */
-    protected function _unsetTokenRequest() {
-        
-        $sessionStorage->tokenRequest = null;
-        unset($sessionStorage->tokenRequest);
     }
 
     /**
