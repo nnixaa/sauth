@@ -1,29 +1,57 @@
 <!DOCTYPE HTML>
 <html lang="en-US">
 <head>
-	<meta charset="UTF-8">
-	<meta name="google-site-verification" content="ulechw5XJLBdsR0-4CvLMjRr3KXOT0jyLZNTEhzE80U" />
-	<title></title>
-	<script type="text/javascript">
+    <meta charset="UTF-8">
+    <!-- Google site verification-->
+    <meta name="google-site-verification" content="ulechw5XJLBdsR0-4CvLMjRr3KXOT0jyLZNTEhzE80U" />
+    <!-- Vkontakte Open api-->
+    <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        VK.init({
+            apiId: <?php echo $this->vkAppId;?>
+
+        });
+    </script>
+    <title>Social Auth</title>
+    <script type="text/javascript">
         function login(by) {
             by =  by || 'google';
-            window.open('/index/auth/by/' + by, 'Auth', 'height=600,width=600,status=no,toolbar=no,menubar=no,location=no, resizable=no');
+            if (by == 'vkontakte') {
+                VK.Auth.login(function(response) {
+                    if (response.session) {
+                        var exdate = new Date();
+                        exdate.setMinutes(exdate.getMinutes() + 10);
+                        var user = response.session.user;
+                        var cookie = 'vk_user_info_' + <?php echo $this->vkAppId;?> +'=';
+                        for (key in user) {
+                            cookie += key + '=' + escape(user[key]) + '&';
+                        }
+                        cookie += '; expires=' + exdate.toUTCString();
+                        document.cookie = cookie;
+                        document.location = '<?php echo $this->vkAuthUrl;?>';
+                    } else {
+                    }
+                });
+            } else {
+                window.open('/index/auth/by/' + by, 'Auth', 'height=600,width=600,status=no,toolbar=no,menubar=no,location=no, resizable=no');
+            }
         }
-	</script>
-	<style type="text/css">
-	   a, img {border: none;}
-	</style>
+    </script>
+    <style type="text/css">
+       a, img {border: none;}
+    </style>
 </head>
 <body>
-	<?php if (!$this->isAuth):?>
-	   <h1>Login via:</h1>
-	   <a href="#" onclick="login('google');return false;"><img src="/img/google.png" /></a>
-	   <a href="#" onclick="login('twitter');return false;"><img src="/img/twitter.png" /></a>
-	   <a href="#" onclick="login('facebook');return false;"><img src="/img/facebook.png" /></a>
-	<?php else:?>
-	   <a href="/index/logout" onclick="">Logout</a>
-	   <div><strong>ID:</strong> <?php echo $this->id;?></div>
-	   <div><strong>Login:</strong> <?php echo $this->login;?></div>
-	<?php endif;?>
+    <?php if (!$this->isAuth):?>
+       <h1>Login via:</h1>
+       <a href="#" onclick="login('google');return false;"><img src="/img/google.png" /></a>
+       <a href="#" onclick="login('twitter');return false;"><img src="/img/twitter.png" /></a>
+       <a href="#" onclick="login('facebook');return false;"><img src="/img/facebook.png" /></a>
+       <a href="#" onclick="login('vkontakte');return false;"><img src="/img/vkontakte.png" /></a>
+    <?php else:?>
+       <a href="/index/logout" onclick="">Logout</a>
+       <div><strong>ID:</strong> <?php echo $this->id;?></div>
+       <div><strong>Login:</strong> <?php echo $this->login;?></div>
+    <?php endif;?>
 </body>
 </html>

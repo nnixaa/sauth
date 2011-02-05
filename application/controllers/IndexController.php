@@ -8,7 +8,7 @@ class IndexController extends Zend_Controller_Action {
         
         $this->config['google'] = array(
             'id' => 'https://www.google.com/accounts/o8/id',
-            'callbackUrl' => '/index/auth',
+            'callbackUrl' => '/index/auth/by/google',
             'exchangeExtension' => array(
                 'openid.ns.ax' => 'http://openid.net/srv/ax/1.0',
                 'openid.ax.mode' => 'fetch_request',
@@ -25,7 +25,7 @@ class IndexController extends Zend_Controller_Action {
             'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
             'userAuthorizationUrl' => 'https://api.twitter.com/oauth/authorize',
             'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
-            'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth',
+            'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth/by/twitter',
         );
           
         $this->config['facebook'] = array(
@@ -34,10 +34,17 @@ class IndexController extends Zend_Controller_Action {
             'clientId' => '184454904920383',
             'userAuthorizationUrl' => 'https://www.facebook.com/dialog/oauth',
             'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-            'redirectUri' => 'http://dnixa.tmweb.ru/index/auth',
+            'redirectUri' => 'http://dnixa.tmweb.ru/index/auth/by/facebook',
             'scope' => array(
                  'user_about_me', 'email',
             ),
+        );
+        
+        $this->config['vkontakte'] = array(
+            'apiId' => '2157310',
+            'apiSecret' => 'ABGeZmiYE46jWvRaeJuD',
+            'redirectUrl' => 'http://dnixa.tmweb.ru',
+            'userAuthorizationUrl' => 'http://dnixa.tmweb.ru/index/auth/by/vkontakte',
         );
     }
     
@@ -46,7 +53,13 @@ class IndexController extends Zend_Controller_Action {
         $googleAuth = new SAuth_Provider_Google($this->config['google']);
         $twitterAuth = new SAuth_Provider_Twitter($this->config['twitter']);
         $facebookAuth = new SAuth_Provider_Facebook($this->config['facebook']);
-        if ($googleAuth->isAuthorized() || $twitterAuth->isAuthorized() || $facebookAuth->isAuthorized()) {
+        $vkontakteAuth = new SAuth_Provider_Vkontakte($this->config['vkontakte']);
+        $this->view->vkAppId = $this->config['vkontakte']['apiId'];
+        $this->view->vkAuthUrl = $this->config['vkontakte']['userAuthorizationUrl'];
+        
+        if ($googleAuth->isAuthorized() || $twitterAuth->isAuthorized() || $facebookAuth->isAuthorized()
+            || $vkontakteAuth->isAuthorized() ) {
+                
             $this->view->isAuth = true;
             if ($googleAuth->isAuthorized()) {
                 $this->view->id = $googleAuth->getAuthId();
@@ -61,6 +74,10 @@ class IndexController extends Zend_Controller_Action {
                 $this->view->id = $facebookAuth->getAuthId();
                 $this->view->login = $facebookAuth->getUserParameters('email');
             }
+            if ($vkontakteAuth->isAuthorized()) {
+                $this->view->id = $vkontakteAuth->getAuthId();
+                $this->view->login = $vkontakteAuth->getUserParameters('first_name');
+            }
         } else {
             $this->view->isAuth = false;
         }
@@ -71,19 +88,20 @@ class IndexController extends Zend_Controller_Action {
         $authBy = $this->getRequest()->getParam('by') ? $this->getRequest()->getParam('by') : 'google';
         switch ($authBy) {
             case 'google':
-                $this->config['google']['callbackUrl'] .= '/by/google';
                 $googleAuth = new SAuth_Provider_Google($this->config['google']);
                 $this->view->auth = $googleAuth->auth();
                 break;
             case 'twitter':
-                $this->config['twitter']['callbackUrl'] .= '/by/twitter';
                 $twitterAuth = new SAuth_Provider_Twitter($this->config['twitter']);
                 $this->view->auth = $twitterAuth->auth();
                 break;
             case 'facebook':
-                $this->config['facebook']['redirectUri'] .= '/by/facebook';
                 $facebookAuth = new SAuth_Provider_Facebook($this->config['facebook']);
                 $this->view->auth = $facebookAuth->auth();
+                break;
+            case 'vkontakte':
+                $vkontakteAuth = new SAuth_Provider_Vkontakte($this->config['vkontakte']);
+                $this->view->auth = $vkontakteAuth->auth();
                 break;
         }
     }
@@ -98,8 +116,9 @@ class IndexController extends Zend_Controller_Action {
         $twitterAuth->clearAuth();
         $facebookAuth = new SAuth_Provider_Facebook($this->config['facebook']);
         $facebookAuth->clearAuth();
+        $vkontakteAuth = new SAuth_Provider_Vkontakte($this->config['vkontakte']);
+        $vkontakteAuth->clearAuth();
         $this->getResponse()->setRedirect('/');
     }
 
 }
-
