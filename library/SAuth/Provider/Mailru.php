@@ -4,6 +4,7 @@
  * Authorisation with mail.ru
  * http://api.mail.ru/docs/guides/oauth/sites/
  * http://api.mail.ru/sites/my/
+ * http://api.mail.ru/docs/guides/restapi/
  */
 class SAuth_Provider_Mailru {
     
@@ -170,6 +171,7 @@ class SAuth_Provider_Mailru {
     
     /**
      * Request user params on mail.ru using REST API
+     * http://api.mail.ru/docs/reference/rest/users-getinfo/
      * FIXME: Working only after auth process, because don't consider expire time
      * @return array User params
      */
