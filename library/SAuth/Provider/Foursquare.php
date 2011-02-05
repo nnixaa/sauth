@@ -1,9 +1,10 @@
 <?php
 
 /**
- * Authorisation with facebook
+ * Authorisation with foursquare
+ * http://developer.foursquare.com/docs/oauth.html
  */
-class SAuth_Provider_Facebook {
+class SAuth_Provider_Foursquare {
     
     /**
      * @var array Configuration array
@@ -13,16 +14,17 @@ class SAuth_Provider_Facebook {
         'consumerSecret' => '',
         'clientId' => '',
         'redirectUri' => '',
-        'userAuthorizationUrl' => 'http://www.facebook.com/dialog/oauth',
-        'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-        'graphUrl' => 'https://graph.facebook.com',
-        'scope' => null,
+        'userAuthorizationUrl' => 'https://foursquare.com/oauth2/authorize',
+        'accessTokenUrl' => 'https://foursquare.com/oauth2/access_token',
+        'responseType' => 'code',
+        'apiUrl' => 'https://api.foursquare.com/v2'
+        
     );
     
     /**
      * @var string Session key
      */
-    protected $_sessionKey = 'SAUTH_FACEBOOK';
+    protected $_sessionKey = 'SAUTH_FOURSQUARE';
     
     /**
      * @var Zend_Session_Namespace Session storage
@@ -68,12 +70,11 @@ class SAuth_Provider_Facebook {
         $clientId = $config['clientId'];
         $clientSecret = $config['consumerSecret'];
         $redirectUrl = $config['redirectUri'];
+        $responseType = $config['responseType'];
         
-        if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) || empty($accessTokenUrl)) {
+        if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
+            || empty($accessTokenUrl)) {
             throw new SAuth_Exception('Facebook auth configuration not specifed.');
-        }
-        if (isset($config['scope']) && !empty($config['scope'])) {
-            $scope = $config['scope'];
         }
         
         if (isset($_GET['code']) && !empty($_GET['code'])) {
@@ -84,7 +85,8 @@ class SAuth_Provider_Facebook {
                 'redirect_uri' => $redirectUrl,
                 'client_secret' => $clientSecret,
                 'code' => $authorizationCode,
-                'scope' => implode($scope, ','),
+                'grant_type' => 'authorization_code',
+
             );
             
             $client = new Zend_Http_Client();
@@ -93,16 +95,17 @@ class SAuth_Provider_Facebook {
             $response = $client->request(Zend_Http_Client::POST);
             
             if ($response->isError()) {
-                //facebook return 400 http code on error
+                //foursquare return 400 http code on error
                 switch  ($response->getStatus()) {
                     case '400':
-                        $jsonError = Zend_Json::decode($response->getBody());
-                        $error = $jsonError['error']['message'];
+                        $parsedErrors = Zend_Json::decode($response->getBody());
+                        $error = $parsedErrors['error'];
                         break;
                     default:
                         $error = 'OAuth service unavailable.';
                         break;
                 }
+
                 return false;
             } elseif ($response->isSuccessful()) {
                 
@@ -114,21 +117,24 @@ class SAuth_Provider_Facebook {
                 }
                 return $this->isAuthorized();
             }
-        } else {
+        } elseif (!isset($_GET['error'])) {
             
             $authorizationConfig = array(
                 'client_id' => $clientId, 
                 'redirect_uri' => $redirectUrl,
+                'response_type' => $responseType,
             );
-            if (isset($scope)) {
-                $authorizationConfig['scope'] = implode($scope, ',');
-            }
+            
             // TODO: maybe http_build_url ?
             $url = $authorizationUrl . '?';
             $url .= http_build_query($authorizationConfig, null, '&');
             header('Location: ' . $url);
             exit(1);
+        } else {
+            $error = $_GET['error'];
+            return false;
         }
+        
     }
     
     /**
@@ -187,20 +193,22 @@ class SAuth_Provider_Facebook {
             return false;
         }
         
-        $graphUrl = $this->getConfig('graphUrl');
+        $apiUrl = $this->getConfig('apiUrl');
         $accessToken = $this->_getTokenAccess();
 
-        if ($accessToken && !empty($graphUrl)) {
+        if ($accessToken && !empty($apiUrl)) {
             $client = new Zend_Http_Client();
-            $url = $graphUrl . '/me';
+            $url = $apiUrl . '/users/self';
             $client->setUri($url);
-            $client->setParameterGET(array('access_token' => $accessToken));
+            $client->setParameterGET(array('oauth_token' => $accessToken));
             $response = $client->request(Zend_Http_Client::GET);
             if ($response->isError()) {
-                $error = 'Request user parameters failed.';
+                $parsedErrors = (array) Zend_Json::decode($response->getBody());
+                $error = $parsedErrors['meta']['errorDetail'];
                 return false;
             } elseif ($response->isSuccessful()) {
-                return Zend_Json::decode($response->getBody());
+                $parsedResponse = (array) Zend_Json::decode($response->getBody());
+                return isset($parsedResponse['response']['user']) ? $parsedResponse['response']['user'] : false;
             }
         }
         return false;
@@ -321,26 +329,15 @@ class SAuth_Provider_Facebook {
     }
     
     /**
-     * Parse url
+     * Parse response
      * @param string $body
-     * @return array
+     * @return array|false
      */
     protected function _parseResponse($body) {
+            
+        $body = trim($body);
         if (is_string($body) && !empty($body)) {
-            $body = trim($body);
-            $pairs = explode('&', $body);
-            $parsed = array();
-            if (is_array($pairs)) {
-                foreach ($pairs as $pair) {
-                    if (!empty($pair)) {
-                        list($key, $value) = explode('=', $pair, 2);
-                        if (!empty($key) && !empty($value)) {
-                            $parsed[$key] = $value;
-                        }
-                    }
-                }
-            }
-            return $parsed;
+            return (array) Zend_Json::decode($body);
         }
         return false;
     }
