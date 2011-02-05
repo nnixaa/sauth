@@ -47,7 +47,7 @@ class SAuth_Provider_Google {
      */
     public function isAuthorized() {
         
-        $accessParams = $this->_getAccessParams();
+        $accessParams = $this->getUserParameters();
         return empty($accessParams) ? false : true;
     }    
 
@@ -57,26 +57,8 @@ class SAuth_Provider_Google {
      */
     public function getAuthId() {
         
-        $id = (string) $this->getUserParam('openid_identity');
+        $id = (string) $this->getUserParameters('openid_identity');
         return !empty($id) ? $id : false;
-    }
-    
-    /**
-     * Returns token params
-     * @param string $key
-     * @return mixed
-     */
-    public function getUserParam($key = null) {
-        
-        $accessParams = $this->_getAccessParams();
-        if (!empty($accessParams)) {
-            
-            if ($key != null) {
-                $key = (string) $key;
-                return $accessParams[$key];
-            }
-        }
-        return false;
     }
     
     /**
@@ -104,7 +86,7 @@ class SAuth_Provider_Google {
         } elseif (isset($_GET['openid_mode']) && $_GET['openid_mode'] == 'id_res') {
                 
             if ($consumer->verify($_GET, $id, $googleExt)) {
-                $this->_setAccessParams($_GET);
+                $this->setUserParameters($_GET);
                 return $this->isAuthorized();
             } else {
                 return false;
@@ -115,23 +97,39 @@ class SAuth_Provider_Google {
     }
     
     /**
-     * Trying get response from session storage
-     * @return false|string
+     * TODO: Cant select multi-level arrays
+     * Returns user parameters
+     * @param string $key
+     * @return mixed
      */
-    protected function _getAccessParams() {
+    public function getUserParameters($key = null) {
         
         $sessionStorage = $this->getSessionStorage();
-        return !empty($sessionStorage->accessParams) ? unserialize($sessionStorage->accessParams) : false;
+        $userParameters = (array) $sessionStorage->userParameters;
+        
+        if (!empty($userParameters)) {
+            
+            if ($key != null) {
+                $key = (string) $key;
+                return isset($userParameters[$key]) ? $userParameters[$key] : false;
+            }
+        }
+        return $userParameters;
     }
 
     /**
-     * Setting response
-     * @return false|string
+     * Setting user parameters in session
+     * @param array $userParameters
+     * @return array
      */
-    protected function _setAccessParams($accessParams) {
-        
+    public function setUserParameters(array $userParameters) {
+            
+        $params = $this->getUserParameters();
+        foreach ($userParameters as $key => $value) {
+            $params[$key] = $value;
+        }
         $sessionStorage = $this->getSessionStorage();
-        return $sessionStorage->accessParams = serialize($accessParams);
+        return $sessionStorage->userParameters = $params;
     }
     
     /**
@@ -199,7 +197,7 @@ class SAuth_Provider_Google {
             
         $key = (string) $key;
         if ($key != null && isset($this->_config[$key])) {
-            return $this->_config[$key];
+            return isset($this->_config[$key]) ? $this->_config[$key] : false;
         }
         return $this->_config;
     }
