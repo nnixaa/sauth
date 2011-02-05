@@ -1,28 +1,30 @@
 <?php
 
 /**
- * Authorisation with facebook
+ * Authorisation with mail.ru
+ * http://api.mail.ru/docs/guides/oauth/sites/
+ * http://api.mail.ru/sites/my/
  */
-class SAuth_Provider_Facebook {
+class SAuth_Provider_Mailru {
     
     /**
      * @var array Configuration array
      */
     protected $_config = array(
-        'consumerKey' => '',
+        'privateKey' => '',
         'consumerSecret' => '',
         'clientId' => '',
         'redirectUri' => '',
-        'userAuthorizationUrl' => 'http://www.facebook.com/dialog/oauth',
-        'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-        'graphUrl' => 'https://graph.facebook.com',
-        'scope' => null,
+        'userAuthorizationUrl' => 'https://connect.mail.ru/oauth/authorize',
+        'accessTokenUrl' => 'https://connect.mail.ru/oauth/token',
+        'responseType' => 'code',
+        'restUrl' => 'http://www.appsmail.ru/platform/api'
     );
     
     /**
      * @var string Session key
      */
-    protected $_sessionKey = 'SAUTH_FACEBOOK';
+    protected $_sessionKey = 'SAUTH_MAILRU';
     
     /**
      * @var Zend_Session_Namespace Session storage
@@ -67,15 +69,15 @@ class SAuth_Provider_Facebook {
         $accessTokenUrl = $config['accessTokenUrl'];
         $clientId = $config['clientId'];
         $clientSecret = $config['consumerSecret'];
+        $privateKey = $config['privateKey'];
         $redirectUrl = $config['redirectUri'];
+        $responseType = $config['responseType'];
         
-        if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) || empty($accessTokenUrl)) {
-            throw new SAuth_Exception('Facebook auth configuration not specifed.');
+        if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
+            || empty($accessTokenUrl) || empty($privateKey)) {
+            throw new SAuth_Exception('Mail.ru auth configuration not specifed.');
         }
-        if (isset($config['scope']) && !empty($config['scope'])) {
-            $scope = $config['scope'];
-        }
-        
+
         if (isset($_GET['code']) && !empty($_GET['code'])) {
             	
             $authorizationCode = trim($_GET['code']);
@@ -84,31 +86,22 @@ class SAuth_Provider_Facebook {
                 'redirect_uri' => $redirectUrl,
                 'client_secret' => $clientSecret,
                 'code' => $authorizationCode,
-                'scope' => implode($scope, ','),
+                'grant_type' => 'authorization_code',
             );
             
             $client = new Zend_Http_Client();
             $client->setUri($accessTokenUrl);
             $client->setParameterPost($accessConfig);
             $response = $client->request(Zend_Http_Client::POST);
-            
             if ($response->isError()) {
-                //facebook return 400 http code on error
-                switch  ($response->getStatus()) {
-                    case '400':
-                        $jsonError = Zend_Json::decode($response->getBody());
-                        $error = $jsonError['error']['message'];
-                        break;
-                    default:
-                        $error = 'OAuth service unavailable.';
-                        break;
-                }
+                $error = 'OAuth service unavailable.';
                 return false;
+                
             } elseif ($response->isSuccessful()) {
                 
                 $parsedResponse = $this->_parseResponse($response->getBody());
                 $this->_setTokenAccess($parsedResponse['access_token']);
-                //try to get user data
+                $this->setUserParameters($parsedResponse);
                 if ($userParameters = $this->requestUserParams()) {
                     $this->setUserParameters($userParameters);
                 }
@@ -119,10 +112,8 @@ class SAuth_Provider_Facebook {
             $authorizationConfig = array(
                 'client_id' => $clientId, 
                 'redirect_uri' => $redirectUrl,
+                'response_type' => $responseType,
             );
-            if (isset($scope)) {
-                $authorizationConfig['scope'] = implode($scope, ',');
-            }
             // TODO: maybe http_build_url ?
             $url = $authorizationUrl . '?';
             $url .= http_build_query($authorizationConfig, null, '&');
@@ -137,7 +128,7 @@ class SAuth_Provider_Facebook {
      */
     public function getAuthId() {
         
-        $id = (int) $this->getUserParameters('id');
+        $id = (int) $this->getUserParameters('uid');
         return $id > 0 ? $id : false;
     }
     
@@ -156,7 +147,7 @@ class SAuth_Provider_Facebook {
             
             if ($key != null) {
                 $key = (string) $key;
-                return $userParameters[$key];
+                return isset($userParameters[$key]) ? $userParameters[$key] : false;
             }
         }
         return $userParameters;
@@ -168,30 +159,47 @@ class SAuth_Provider_Facebook {
      * @return array
      */
     public function setUserParameters(array $userParameters) {
+            
+        $params = $this->getUserParameters();
+        foreach ($userParameters as $key => $value) {
+            $params[$key] = $value;
+        }
         $sessionStorage = $this->getSessionStorage();
-        return $sessionStorage->userParameters = $userParameters;
+        return $sessionStorage->userParameters = $params;
     }
     
     /**
-     * Request user params on facebook using Graph API
+     * Request user params on mail.ru using REST API
+     * FIXME: Working only after auth process, because don't consider expire time
      * @return array User params
      */
     public function requestUserParams() {
         
-        $graphUrl = $this->getConfig('graphUrl');
+        $restUrl = $this->getConfig('restUrl');
         $accessToken = $this->_getTokenAccess();
-
-        if ($accessToken && !empty($graphUrl)) {
+        $config = $this->getConfig();
+        
+        if ($accessToken && !empty($restUrl)) {
             $client = new Zend_Http_Client();
-            $url = $graphUrl . '/me';
-            $client->setUri($url);
-            $client->setParameterGET(array('access_token' => $accessToken));
-            $response = $client->request(Zend_Http_Client::GET);
+            $client->setUri($restUrl);
+            $requestParametrs = array(
+                'app_id' => $config['clientId'],
+                'method' => 'users.getInfo',
+                'secure' => 1,
+                'session_key' => $accessToken,
+            );
+            $sig = $this->getSign($requestParametrs);
+            $requestParametrs['sig'] = $sig;
+            
+            $client->setParameterPOST($requestParametrs);
+            $response = $client->request(Zend_Http_Client::POST);
             if ($response->isError()) {
-                $error = 'Request user parameters failed.';
+                $parsedErrors = (array) Zend_Json::decode($response->getBody());
+                $error = $parsedErrors['error']['error_msg'];
                 return false;
             } elseif ($response->isSuccessful()) {
-                return $userParams = Zend_Json::decode($response->getBody());
+                $parsedResponse = (array) Zend_Json::decode($response->getBody());
+                return isset($parsedResponse[0]) ? $parsedResponse[0] : false;
             }
         }
         return false;
@@ -260,8 +268,8 @@ class SAuth_Provider_Facebook {
     public function getConfig($key = null) {
             
         $key = (string) $key;
-        if ($key != null && isset($this->_config[$key])) {
-            return $this->_config[$key];
+        if ($key != null) {
+            return isset($this->_config[$key]) ? $this->_config[$key] : false;
         }
         return $this->_config;
     }
@@ -312,40 +320,18 @@ class SAuth_Provider_Facebook {
     }
     
     /**
-     * Parse url
+     * Parse response
      * @param string $body
-     * @return array
+     * @return array|false
      */
     protected function _parseResponse($body) {
+        
         if (is_string($body) && !empty($body)) {
-            $body = trim($body);
-            $pairs = explode('&', $body);
-            $parsed = array();
-            if (is_array($pairs)) {
-                foreach ($pairs as $pair) {
-                    if (!empty($pair)) {
-                        list($key, $value) = explode('=', $pair, 2);
-                        if (!empty($key) && !empty($value)) {
-                            $parsed[$key] = $value;
-                        }
-                    }
-                }
-            }
-            return $parsed;
+            return Zend_Json::decode($body);
         }
         return false;
     }
     
-    /**
-     * Trying get token request from session storage
-     * @return false|string
-     */
-    protected function _getTokenRequest() {
-        
-        $sessionStorage = $this->getSessionStorage();
-        return !empty($sessionStorage->tokenRequest) ? unserialize($sessionStorage->tokenRequest) : false;
-    }
-
     /**
      * Trying get token access from session storage
      * @return false|string
@@ -354,17 +340,6 @@ class SAuth_Provider_Facebook {
         
         $sessionStorage = $this->getSessionStorage();
         return !empty($sessionStorage->tokenAccess) ? unserialize($sessionStorage->tokenAccess) : false;
-    }
-
-    /**
-     * Setting token request from session storage
-     * @param string $tokenRequest
-     * @return string
-     */
-    protected function _setTokenRequest($tokenRequest) {
-        
-        $sessionStorage = $this->getSessionStorage();
-        return $sessionStorage->tokenRequest = serialize($tokenRequest);
     }
 
     /**
@@ -394,5 +369,24 @@ class SAuth_Provider_Facebook {
             
         $sessionStorage->tokenAccess = null;
         unset($sessionStorage->tokenAccess);
+    }
+    
+    /**
+     * Return mail.ru sign
+     * @param array $requestParams Request parameters
+     * @return string Signature
+     */
+    protected function getSign(array $requestParams) {
+        
+        $config = $this->getConfig();
+        $uid = $this->_getTokenAccess();
+        $privateKey = $config['privateKey'];
+        
+        ksort($requestParams);
+        $params = '';
+        foreach ($requestParams as $key => $value) {
+            $params .= $key . '=' . $value;
+        }
+        return md5($params . $privateKey);
     }
 }
