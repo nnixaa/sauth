@@ -190,13 +190,13 @@ class SAuth_Provider_Facebook {
             $client = new Zend_Http_Client();
             $url = $graphUrl . '/me';
             $client->setUri($url);
-            $client->setParameterPOST(array('access_token' => $accessToken));
-            $response = $client->request(Zend_Http_Client::POST);
+            $client->setParameterGET(array('access_token' => $accessToken));
+            $response = $client->request(Zend_Http_Client::GET);
             if ($response->isError()) {
                 $error = 'Request user parameters failed.';
                 return false;
             } elseif ($response->isSuccessful()) {
-                return $userParams = Zend_Json::decode($response->getBody());
+                return Zend_Json::decode($response->getBody());
             }
         }
         return false;
