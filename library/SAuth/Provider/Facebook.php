@@ -323,8 +323,12 @@ class SAuth_Provider_Facebook {
             $parsed = array();
             if (is_array($pairs)) {
                 foreach ($pairs as $pair) {
-                    list($key, $value) = explode('=', $pair);
-                    $parsed[$key] = $value;
+                    if (!empty($pair)) {
+                        list($key, $value) = explode('=', $pair, 2);
+                        if (!empty($key) && !empty($value)) {
+                            $parsed[$key] = $value;
+                        }
+                    }
                 }
             }
             return $parsed;
