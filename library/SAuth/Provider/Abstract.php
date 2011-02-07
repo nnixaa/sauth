@@ -86,7 +86,7 @@ abstract class SAuth_Provider_Abstract {
         
         $sessionKey = (string) $this->getSessionKey();
         if (empty($sessionKey)) {
-            throw new SAuth_Exception('Invalid auth storage key');
+            throw new SAuth_Exception('Invalid auth storage key.');
         }
         $this->_sessionStorage = new Zend_Session_Namespace($sessionKey);
         $this->_sessionStorage->setExpirationSeconds($this->getSessionLiveTime());

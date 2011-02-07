@@ -30,7 +30,7 @@ class SAuth_Provider_Google extends SAuth_Provider_Abstract implements SAuth_Pro
         
         $config = $this->setConfig($config);
         if (!isset($config['id']) || empty($config['id'])) {
-            throw new SAuth_Exception('Invalid google OpenId url');
+            throw new SAuth_Exception('Invalid google OpenId url.');
         }
         $consumer = new Ak33m_OpenId_Consumer();
         $googleExt = new SAuth_Provider_Google_Extension();
