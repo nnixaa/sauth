@@ -1,5 +1,15 @@
 <?php
 
+/**  SAuth_Provider_Abstract */
+require_once 'SAuth/Provider/Abstract.php';
+
+/**  SAuth_Provider_Interface */
+require_once 'SAuth/Provider/Interface.php';
+
+/**  Zend_Oauth_Consumer */
+require_once 'Zend/Oauth/Consumer.php';
+
+
 /**
  * Authorisation with twitter
  * http://developer.twitter.com/pages/auth
@@ -40,6 +50,7 @@ class SAuth_Provider_Twitter extends SAuth_Provider_Abstract implements SAuth_Pr
         if (empty($config['consumerKey']) || empty($config['consumerSecret']) || empty($config['userAuthorizationUrl']) 
             || empty($config['accessTokenUrl']) || empty($config['callbackUrl'])) {
                 
+            require_once 'SAuth/Exception.php';
             throw new SAuth_Exception('Twitter auth configuration not specifed.');
         }
         

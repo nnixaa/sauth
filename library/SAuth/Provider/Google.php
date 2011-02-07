@@ -1,5 +1,17 @@
 <?php
 
+/**  SAuth_Provider_Abstract */
+require_once 'SAuth/Provider/Abstract.php';
+
+/**  SAuth_Provider_Interface */
+require_once 'SAuth/Provider/Interface.php';
+
+/**  SAuth_Provider_Google_Extension */
+require_once 'SAuth/Provider/Google/Extension.php';
+
+/**  SAuth_Provider_Google_Extension */
+require_once 'Ak33m/OpenId/Consumer.php';
+
 /**
  * Authorisation with google
  * http://code.google.com/apis/accounts/docs/OpenID.html
@@ -29,7 +41,9 @@ class SAuth_Provider_Google extends SAuth_Provider_Abstract implements SAuth_Pro
     public function auth(array $config = array()) {
         
         $config = $this->setConfig($config);
-        if (!isset($config['id']) || empty($config['id'])) {
+        if (empty($config['id'])) {
+            
+            require_once 'SAuth/Exception.php';
             throw new SAuth_Exception('Invalid google OpenId url.');
         }
         $consumer = new Ak33m_OpenId_Consumer();

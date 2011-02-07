@@ -1,5 +1,11 @@
 <?php
 
+/**  SAuth_Provider_Abstract */
+require_once 'SAuth/Provider/Abstract.php';
+
+/**  SAuth_Provider_Interface */
+require_once 'SAuth/Provider/Interface.php';
+
 /**
  * Authorisation with vkontakte
  * http://vkontakte.ru/developers.php?o=-1&p=Open+API
@@ -37,6 +43,8 @@ class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_
         $apiSecret = $config['apiSecret'];
         
         if (empty($apiId) || empty($apiId)) {
+            
+            require_once 'SAuth/Exception.php';
             throw new SAuth_Exception('Vkontakte auth configuration not specifed.');
         }
         $appCookie = isset($_COOKIE['vk_app_' . $apiId]) ? $this->_parseResponse($_COOKIE['vk_app_' . $apiId]) : null;

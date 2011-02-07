@@ -86,6 +86,7 @@ abstract class SAuth_Provider_Abstract {
         
         $sessionKey = (string) $this->getSessionKey();
         if (empty($sessionKey)) {
+            require_once 'SAuth/Exception.php';
             throw new SAuth_Exception('Invalid auth storage key.');
         }
         $this->_sessionStorage = new Zend_Session_Namespace($sessionKey);

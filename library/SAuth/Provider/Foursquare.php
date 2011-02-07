@@ -1,5 +1,15 @@
 <?php
 
+/**  SAuth_Provider_Abstract */
+require_once 'SAuth/Provider/Abstract.php';
+
+/**  SAuth_Provider_Interface */
+require_once 'SAuth/Provider/Interface.php';
+
+/**  Zend_Http_Client */
+require_once 'Zend/Http/Client.php';
+
+
 /**
  * Authorisation with foursquare
  * http://developer.foursquare.com/docs/oauth.html
@@ -44,6 +54,8 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
             || empty($accessTokenUrl)) {
+                
+            require_once 'SAuth/Exception.php';
             throw new SAuth_Exception('Facebook auth configuration not specifed.');
         }
         

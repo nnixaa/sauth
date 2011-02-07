@@ -1,5 +1,15 @@
 <?php
 
+/**  SAuth_Provider_Abstract */
+require_once 'SAuth/Provider/Abstract.php';
+
+/**  SAuth_Provider_Interface */
+require_once 'SAuth/Provider/Interface.php';
+
+/**  Zend_Http_Client */
+require_once 'Zend/Http/Client.php';
+
+
 /**
  * Authorisation with mail.ru
  * http://api.mail.ru/docs/guides/oauth/sites/
@@ -46,6 +56,8 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
             || empty($accessTokenUrl) || empty($privateKey)) {
+                
+            require_once 'SAuth/Exception.php';    
             throw new SAuth_Exception('Mail.ru auth configuration not specifed.');
         }
 

@@ -1,5 +1,14 @@
 <?php
 
+/**  SAuth_Provider_Abstract */
+require_once 'SAuth/Provider/Abstract.php';
+
+/**  SAuth_Provider_Interface */
+require_once 'SAuth/Provider/Interface.php';
+
+/**  Zend_Http_Client */
+require_once 'Zend/Http/Client.php';
+
 /**
  * Authorisation with facebook
  * http://developers.facebook.com/docs/authentication
@@ -40,7 +49,10 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
         $clientSecret = $config['consumerSecret'];
         $redirectUrl = $config['redirectUri'];
         
-        if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) || empty($accessTokenUrl)) {
+        if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
+            || empty($accessTokenUrl)) {
+                
+            require_once 'SAuth/Exception.php';    
             throw new SAuth_Exception('Facebook auth configuration not specifed.');
         }
         if (isset($config['scope']) && !empty($config['scope'])) {
