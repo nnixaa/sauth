@@ -67,8 +67,8 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
                 //facebook return 400 http code on error
                 switch  ($response->getStatus()) {
                     case '400':
-                        $jsonError = Zend_Json::decode($response->getBody());
-                        $error = $jsonError['error']['message'];
+                        $parsedErrors = Zend_Json::decode($response->getBody());
+                        $error = $parsedErrors['error']['message'];
                         break;
                     default:
                         $error = 'OAuth service unavailable.';
