@@ -139,31 +139,7 @@ abstract class SAuth_Provider_Abstract {
         }
         return $this->_config;
     }
-    
-    /**
-     * Setting session key
-     * After setSession key you must reset session storage calling setUpSessionStorage
-     * @param string $key 
-     * @return false|string
-     */
-    public function setSessionKey($key) {
-        
-        $key = (string) $key;
-        if (!empty($key)) {
-            return $this->_sessionKey = $key;
-        }
-        return false;
-    }
-    
-    /**
-     * Getting session key
-     * @return string
-     */
-    public function getSessionKey() {
-        
-        return $this->_sessionKey;
-    }
-    
+      
     /**
      * Settion session live time
      * @param int $time

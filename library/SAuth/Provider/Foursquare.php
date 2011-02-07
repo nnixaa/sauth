@@ -4,7 +4,7 @@
  * Authorisation with foursquare
  * http://developer.foursquare.com/docs/oauth.html
  */
-class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract {
+class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
     
     /**
      * @var array Configuration array

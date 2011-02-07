@@ -4,7 +4,7 @@
  * Authorisation with twitter
  * http://developer.twitter.com/pages/auth
  */
-class SAuth_Provider_Twitter extends SAuth_Provider_Abstract {
+class SAuth_Provider_Twitter extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
     
     /**
      * @var array Configuration array

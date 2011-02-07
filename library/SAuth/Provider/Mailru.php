@@ -6,7 +6,7 @@
  * http://api.mail.ru/sites/my/
  * http://api.mail.ru/docs/guides/restapi/
  */
-class SAuth_Provider_Mailru extends SAuth_Provider_Abstract {
+class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
     
     /**
      * @var array Configuration array

@@ -4,7 +4,7 @@
  * Authorisation with vkontakte
  * http://vkontakte.ru/developers.php?o=-1&p=Open+API
  */
-class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract{
+class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
     
     /**
      * @var array Configuration array

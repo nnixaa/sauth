@@ -4,7 +4,7 @@
  * Authorisation with google
  * http://code.google.com/apis/accounts/docs/OpenID.html
  */
-class SAuth_Provider_Google extends SAuth_Provider_Abstract {
+class SAuth_Provider_Google extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
 
     /**
      * @var array Configuration array

@@ -4,7 +4,7 @@
  * Authorisation with facebook
  * http://developers.facebook.com/docs/authentication
  */
-class SAuth_Provider_Facebook extends SAuth_Provider_Abstract {
+class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
     
     /**
      * @var array Configuration array
