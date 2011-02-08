@@ -56,7 +56,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
             || empty($accessTokenUrl)) {
                 
             require_once 'SAuth/Exception.php';
-            throw new SAuth_Exception('Facebook auth configuration not specifed.');
+            throw new SAuth_Exception('Foursquare auth configuration not specifed.');
         }
         
         if (isset($_GET['code']) && !empty($_GET['code'])) {
