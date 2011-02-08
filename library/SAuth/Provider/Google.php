@@ -24,8 +24,8 @@ class SAuth_Provider_Google extends SAuth_Provider_Abstract implements SAuth_Pro
     protected $_config = array(
         'id' => 'https://www.google.com/accounts/o8/id',
         'callbackUrl' => '',
-        'exchangeExtension' => array(),
         'root' => '',
+        'exchangeExtension' => array(),
     );
     
     /**

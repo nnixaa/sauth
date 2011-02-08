@@ -16,9 +16,9 @@ class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_
      * @var array Configuration array
      */
     protected $_config = array(
-        'apiId' => '',
-        'apiSecret' => '',
-        'redirectUrl' => '',
+        'consumerId' => '',
+        'consumerSecret' => '',
+        'callbackUrl' => '',
     );
     
     /**
@@ -39,8 +39,8 @@ class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_
         
         $config = $this->setConfig($config);
         
-        $apiId = $config['apiId'];
-        $apiSecret = $config['apiSecret'];
+        $apiId = $config['consumerId'];
+        $apiSecret = $config['consumerSecret'];
         
         if (empty($apiId) || empty($apiId)) {
             
@@ -59,10 +59,10 @@ class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_
                 $this->setUserParameters((array) $appCookie);
                 $this->setUserParameters((array) $vkUserCookie);
                 //unset vk info cookie
-                setcookie('vk_user_info_' . $apiId, '', time()-1000, '/');
+                setcookie('vk_user_info_' . $apiId, '', time() - 1000, '/');
                 
-                if (!empty($config['redirectUrl'])) {
-                    header('Location:' . $config['redirectUrl']);
+                if (!empty($config['callbackUrl'])) {
+                    header('Location:' . $config['callbackUrl']);
                     exit(1);
                 }
                 return $this->isAuthorized();

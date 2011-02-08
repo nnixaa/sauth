@@ -24,10 +24,10 @@ class SAuth_Provider_Twitter extends SAuth_Provider_Abstract implements SAuth_Pr
         'consumerKey' => '',
         'consumerSecret' => '',
         'version' => '1.0',
+        'callbackUrl' => '',
         'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
         'userAuthorizationUrl' => 'https://api.twitter.com/oauth/authorize',
         'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
-        'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth',
     );
     
     /**

@@ -19,14 +19,14 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
      * @var array Configuration array
      */
     protected $_config = array(
+        'consumerId' => '',
         'consumerKey' => '',
         'consumerSecret' => '',
-        'clientId' => '',
-        'redirectUri' => '',
+        'callbackUrl' => '',
+        'requestDatarUrl' => 'https://graph.facebook.com',
         'userAuthorizationUrl' => 'http://www.facebook.com/dialog/oauth',
         'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-        'graphUrl' => 'https://graph.facebook.com',
-        'scope' => null,
+        'scope' => array(),
     );
     
     /**
@@ -45,9 +45,9 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
         
         $authorizationUrl = $config['userAuthorizationUrl'];
         $accessTokenUrl = $config['accessTokenUrl'];
-        $clientId = $config['clientId'];
+        $clientId = $config['consumerId'];
         $clientSecret = $config['consumerSecret'];
-        $redirectUrl = $config['redirectUri'];
+        $redirectUrl = $config['callbackUrl'];
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
             || empty($accessTokenUrl)) {
@@ -67,9 +67,10 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
                 'redirect_uri' => $redirectUrl,
                 'client_secret' => $clientSecret,
                 'code' => $authorizationCode,
-                'scope' => implode($scope, ','),
             );
-            
+            if (isset($scope) && !empty($scope)) {
+                $accessConfig['scope'] = implode($scope, ',');
+            }
             $client = new Zend_Http_Client();
             $client->setUri($accessTokenUrl);
             $client->setParameterPost($accessConfig);
@@ -134,7 +135,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
             return false;
         }
         
-        $graphUrl = $this->getConfig('graphUrl');
+        $graphUrl = $this->getConfig('requestDatarUrl');
         $accessToken = $this->_getTokenAccess();
 
         if ($accessToken && !empty($graphUrl)) {

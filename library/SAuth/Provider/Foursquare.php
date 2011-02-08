@@ -20,14 +20,14 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
      * @var array Configuration array
      */
     protected $_config = array(
+        'consumerId' => '',
         'consumerKey' => '',
         'consumerSecret' => '',
-        'clientId' => '',
-        'redirectUri' => '',
+        'callbackUrl' => '',
         'userAuthorizationUrl' => 'https://foursquare.com/oauth2/authorize',
         'accessTokenUrl' => 'https://foursquare.com/oauth2/access_token',
+        'requestDatarUrl' => 'https://api.foursquare.com/v2',
         'responseType' => 'code',
-        'apiUrl' => 'https://api.foursquare.com/v2'
         
     );
     
@@ -47,9 +47,9 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
         
         $authorizationUrl = $config['userAuthorizationUrl'];
         $accessTokenUrl = $config['accessTokenUrl'];
-        $clientId = $config['clientId'];
+        $clientId = $config['consumerId'];
         $clientSecret = $config['consumerSecret'];
-        $redirectUrl = $config['redirectUri'];
+        $redirectUrl = $config['callbackUrl'];
         $responseType = $config['responseType'];
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
@@ -139,7 +139,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
             return false;
         }
         
-        $apiUrl = $this->getConfig('apiUrl');
+        $apiUrl = $this->getConfig('requestDatarUrl');
         $accessToken = $this->_getTokenAccess();
 
         if ($accessToken && !empty($apiUrl)) {

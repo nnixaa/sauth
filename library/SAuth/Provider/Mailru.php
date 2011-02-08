@@ -22,14 +22,14 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
      * @var array Configuration array
      */
     protected $_config = array(
+        'consumerId' => '',
         'privateKey' => '',
         'consumerSecret' => '',
-        'clientId' => '',
-        'redirectUri' => '',
+        'callbackUrl' => '',
         'userAuthorizationUrl' => 'https://connect.mail.ru/oauth/authorize',
         'accessTokenUrl' => 'https://connect.mail.ru/oauth/token',
+        'requestDatarUrl' => 'http://www.appsmail.ru/platform/api',
         'responseType' => 'code',
-        'restUrl' => 'http://www.appsmail.ru/platform/api'
     );
     
     /**
@@ -48,10 +48,10 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
         
         $authorizationUrl = $config['userAuthorizationUrl'];
         $accessTokenUrl = $config['accessTokenUrl'];
-        $clientId = $config['clientId'];
+        $clientId = $config['consumerId'];
         $clientSecret = $config['consumerSecret'];
         $privateKey = $config['privateKey'];
-        $redirectUrl = $config['redirectUri'];
+        $redirectUrl = $config['callbackUrl'];
         $responseType = $config['responseType'];
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
@@ -127,7 +127,7 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             return false;
         }
         
-        $restUrl = $this->getConfig('restUrl');
+        $restUrl = $this->getConfig('requestDatarUrl');
         $accessToken = $this->_getTokenAccess();
         $config = $this->getConfig();
         
@@ -135,7 +135,7 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             $client = new Zend_Http_Client();
             $client->setUri($restUrl);
             $requestParametrs = array(
-                'app_id' => $config['clientId'],
+                'app_id' => $config['consumerId'],
                 'method' => 'users.getInfo',
                 'secure' => 1,
                 'session_key' => $accessToken,
