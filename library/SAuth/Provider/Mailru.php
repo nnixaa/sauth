@@ -158,24 +158,11 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
     }
     
     /**
-     * Parse response
-     * @param string $body
-     * @return array|false
-     */
-    protected function _parseResponse($body) {
-        
-        if (is_string($body) && !empty($body)) {
-            return Zend_Json::decode($body);
-        }
-        return false;
-    }
-    
-    /**
      * Return mail.ru sign
      * @param array $requestParams Request parameters
      * @return string Signature
      */
-    protected function getSign(array $requestParams) {
+    public function getSign(array $requestParams) {
         
         $config = $this->getConfig();
         $uid = $this->_getTokenAccess();
@@ -186,5 +173,18 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             $params .= $key . '=' . $value;
         }
         return md5($params . $consumerSecret);
+    }    
+    
+    /**
+     * Parse response
+     * @param string $body
+     * @return array|false
+     */
+    protected function _parseResponse($body) {
+        
+        if (is_string($body) && !empty($body)) {
+            return Zend_Json::decode($body);
+        }
+        return false;
     }
 }
