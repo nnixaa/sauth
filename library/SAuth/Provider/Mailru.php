@@ -143,7 +143,7 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             $sig = $this->getSign($requestParametrs);
             $requestParametrs['sig'] = $sig;
             
-            $client->setParameterPOST($requestParametrs);
+            $client->setParameterPost($requestParametrs);
             $response = $client->request(Zend_Http_Client::POST);
             if ($response->isError()) {
                 $parsedErrors = (array) Zend_Json::decode($response->getBody());
