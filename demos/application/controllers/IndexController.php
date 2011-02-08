@@ -5,64 +5,7 @@ class IndexController extends Zend_Controller_Action {
     public $config = array();
     
     public function init() {
-        
-        $this->config['google'] = array(
-            'id' => 'https://www.google.com/accounts/o8/id',
-            'callbackUrl' => '/index/auth/by/google',
-            'exchangeExtension' => array(
-                'openid.ns.ax' => 'http://openid.net/srv/ax/1.0',
-                'openid.ax.mode' => 'fetch_request',
-                'openid.ax.type.email' => 'http://axschema.org/contact/email',
-                'openid.ax.required' => 'email',
-            ),
-        );
-        
-        $this->config['twitter'] = array(
-            'requestScheme' => Zend_Oauth::REQUEST_SCHEME_HEADER,
-            'consumerKey' => 'GAgdRjJmORMNtfEQDzoWWw',
-            'consumerSecret' => 'HnwlFxrA60206FNv8TYG1jxjJdHeB24E0tTmBjsDwQ',
-            'version' => '1.0',
-            'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
-            'userAuthorizationUrl' => 'https://api.twitter.com/oauth/authorize',
-            'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
-            'callbackUrl' => 'http://dnixa.tmweb.ru/index/auth/by/twitter',
-        );
-          
-        $this->config['facebook'] = array(
-            'consumerKey' => '327c9cbf33902ff250f8248519fe09d9',
-            'consumerSecret' => '4b5ebef60169f606d6a3763df3173b23',
-            'clientId' => '184454904920383',
-            'userAuthorizationUrl' => 'https://www.facebook.com/dialog/oauth',
-            'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-            'redirectUri' => 'http://dnixa.tmweb.ru/index/auth/by/facebook',
-            'scope' => array(
-                 'user_about_me', 'email',
-            ),
-        );
-        
-        $this->config['vkontakte'] = array(
-            'apiId' => '2157310',
-            'apiSecret' => 'ABGeZmiYE46jWvRaeJuD',
-            'redirectUrl' => 'http://dnixa.tmweb.ru',
-            'userAuthorizationUrl' => 'http://dnixa.tmweb.ru/index/auth/by/vkontakte',
-        );
-        
-        $this->config['mailru'] = array(
-            'consumerSecret' => '3a2381491f9dc192048ef286e6072d2c',
-            'privateKey' => 'd2eaa0a682c17da8afd94377c1f55e6c',
-            'clientId' => '586934',
-            'userAuthorizationUrl' => 'https://connect.mail.ru/oauth/authorize',
-            'accessTokenUrl' => 'https://connect.mail.ru/oauth/token',
-            'redirectUri' => 'http://dnixa.tmweb.ru/index/auth/by/mailru',
-        );
-        
-        $this->config['foursquare'] = array(
-            'consumerSecret' => '5TMLM0TY3AXFZI1CQHPBDCWZJ0RQZDBKUAGQHHLHJE1I43I2',
-            'clientId' => '5THSZIOOWVTDJNGB0I3LPWVJYQ4QILZZSVCT2Q3G3FTQDUQ3',
-            'userAuthorizationUrl' => 'https://foursquare.com/oauth2/authorize',
-            'accessTokenUrl' => 'https://foursquare.com/oauth2/access_token',
-            'redirectUri' => 'http://dnixa.tmweb.ru/index/auth/by/foursquare',
-        );
+        $this->config = Zend_Registry::get('sauthConf');
     }
     
     public function indexAction() {
@@ -74,7 +17,7 @@ class IndexController extends Zend_Controller_Action {
         $mailruAuth = new SAuth_Provider_Mailru($this->config['mailru']);
         $foursquareAuth = new SAuth_Provider_Foursquare($this->config['foursquare']);
         
-        $this->view->vkAppId = $this->config['vkontakte']['apiId'];
+        $this->view->vkAppId = $this->config['vkontakte']['consumerId'];
         $this->view->vkAuthUrl = $this->config['vkontakte']['userAuthorizationUrl'];
         
         if ($googleAuth->isAuthorized() || $twitterAuth->isAuthorized() || $facebookAuth->isAuthorized()
