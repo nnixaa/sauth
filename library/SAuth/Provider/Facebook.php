@@ -23,9 +23,9 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
         'consumerKey' => '',
         'consumerSecret' => '',
         'callbackUrl' => '',
-        'requestDatarUrl' => 'https://graph.facebook.com',
         'userAuthorizationUrl' => 'http://www.facebook.com/dialog/oauth',
         'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
+        'requestDatarUrl' => 'https://graph.facebook.com',
         'scope' => array(),
     );
     
