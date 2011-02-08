@@ -179,13 +179,12 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
         
         $config = $this->getConfig();
         $uid = $this->_getTokenAccess();
-        $privateKey = $config['privateKey'];
-        
+        $consumerSecret = $config['consumerSecret'];
         ksort($requestParams);
         $params = '';
         foreach ($requestParams as $key => $value) {
             $params .= $key . '=' . $value;
         }
-        return md5($params . $privateKey);
+        return md5($params . $consumerSecret);
     }
 }
