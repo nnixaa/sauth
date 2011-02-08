@@ -8,6 +8,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $autoloader->registerNamespace('SAuth_');
     }
 
+    /**
+     * You should specify your own configuration
+     */
     protected function _initSauth() {
         
         $sauthConf['google'] = array(
