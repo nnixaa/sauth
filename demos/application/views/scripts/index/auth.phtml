@@ -7,14 +7,15 @@
     <script type="text/javascript">
         function reload() {
             window.opener.location = window.opener.location;
+            window.close();
         }
     </script>
 </head>
-<body onunload="reload();">
+<body onload="reload();">
 <?php if ($this->auth):?>
 <h2 class="error">Congratulations, you are logged in! Please close this window.</h2>
 <?php else:?>
-<h2 class="error">Error has occurred. Please close this window and try again.</h2>
+<h2 class="error">Error has occurred. Please <a onclick="window.close();" href="#">close</a> this window and try again.</h2>
 <?php endif;?>
 </body>
 </html>
