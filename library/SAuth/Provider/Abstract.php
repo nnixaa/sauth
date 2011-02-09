@@ -109,39 +109,12 @@ abstract class SAuth_Provider_Abstract {
     }
     
     /**
-     * Setting session key
-     * After setSession key you must reset session storage calling setUpSessionStorage
-     * @param string $key 
-     * @return false|string
-     */
-    public function setSessionKey($key) {
-        
-        $key = (string) $key;
-        if (!empty($key)) {
-            return $this->_sessionKey = $key;
-        }
-        return false;
-    }
-    
-    /**
      * Getting session key
      * @return string
      */
     public function getSessionKey() {
         
         return $this->_sessionKey;
-    }
-
-    /**
-     * Settion session live time
-     * @param int $time
-     * @return false|int
-     */
-    public function setSessionLiveTime($time) {
-        if ($time > 0) {
-            return $this->_sessionLiveTime = (int) $time;
-        }
-        return false;
     }
 
     /**
@@ -161,18 +134,21 @@ abstract class SAuth_Provider_Abstract {
     public function setConfig(array $config = array()) {
             
         foreach ($config as $key => $value) {
+        	
             switch ($key) {
                 case 'sessionKey':
-                    $this->setSessionKey($value);
+                    $this->_setSessionKey($value);
                     unset($config[$key]);
                     break;
+					
                 case 'sessionLiveTime':
-                    $this->setSessionLiveTime($value);
+                    $this->_setSessionLiveTime($value);
                     unset($config[$key]);
+					
                 default:
+					$this->_config[$key] = $value;
                     break;
             }
-            $this->_config[$key] = $value;
         }
         return $this->getConfig();
     }
@@ -198,6 +174,33 @@ abstract class SAuth_Provider_Abstract {
         return $this->_errors;
     }
     
+    /** 
+     * Setting session key
+     * After setSession key you must reset session storage calling setUpSessionStorage
+     * @param string $key 
+     * @return false|string
+     */
+    protected function _setSessionKey($key) {
+        
+        $key = (string) $key;
+        if (!empty($key)) {
+            return $this->_sessionKey = $key;
+        }
+        return false;
+    }	
+	
+    /**
+     * Settion session live time
+     * @param int $time
+     * @return false|int
+     */
+    protected function _setSessionLiveTime($time) {
+        if ($time > 0) {
+            return $this->_sessionLiveTime = (int) $time;
+        }
+        return false;
+    }	
+	
     /**
      * Getting token access from session storage
      * @return false|string
