@@ -59,13 +59,6 @@ interface SAuth_Provider_Interface {
     public function getConfig($key = null);
     
     /**
-     * Settion session live time
-     * @param int $time
-     * @return false|int
-     */
-    public function setSessionLiveTime($time);
-    
-    /**
      * Gettion session live time
      * @return int
      */
