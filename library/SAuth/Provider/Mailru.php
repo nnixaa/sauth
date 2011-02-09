@@ -90,7 +90,7 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
                 }
                 return $this->isAuthorized();
             }
-        } else {
+        } elseif (!isset($_GET['error'])) {
             
             $authorizationConfig = array(
                 'client_id' => $clientId, 
@@ -102,6 +102,9 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             $url .= http_build_query($authorizationConfig, null, '&');
             header('Location: ' . $url);
             exit(1);
+        } else {
+            $error = $_GET['error'];
+            return false;
         }
     }
     

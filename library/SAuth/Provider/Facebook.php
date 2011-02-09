@@ -68,7 +68,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
                 'client_secret' => $clientSecret,
                 'code' => $authorizationCode,
             );
-            if (isset($scope) && !empty($scope)) {
+            if (isset($scope)) {
                 $accessConfig['scope'] = implode($scope, ',');
             }
             $client = new Zend_Http_Client();
@@ -98,7 +98,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
                 }
                 return $this->isAuthorized();
             }
-        } else {
+        } elseif (!isset($_GET['error'])) {
             
             $authorizationConfig = array(
                 'client_id' => $clientId, 
@@ -112,6 +112,9 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
             $url .= http_build_query($authorizationConfig, null, '&');
             header('Location: ' . $url);
             exit(1);
+        } else {
+            $error = $_GET['error'];
+            return false;
         }
     }
     
