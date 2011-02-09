@@ -168,14 +168,6 @@ abstract class SAuth_Provider_Abstract {
     }    
     
     /**
-     * Getting errors array
-     */
-    public function getErrors() {
-        return $this->_errors;
-    }
-    
-    
-    /**
      * Parse response url
      * @param string $url
      * @return array|false
@@ -204,6 +196,24 @@ abstract class SAuth_Provider_Abstract {
             
         $body = (string) trim($body);
         return Zend_Json::decode($body);
+    }    
+    
+    /**
+     * Send http request
+     * @param string $type GET or POST
+     * @param string $url 
+     * @param string $parameters
+     * @return Zend_Http_Response
+     */
+    public function httpRequest($type, $url, $parameters) {
+        
+    }
+    
+    /**
+     * Getting errors array
+     */
+    public function getErrors() {
+        return $this->_errors;
     }    
     
     /** 
