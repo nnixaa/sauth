@@ -16,6 +16,11 @@ abstract class SAuth_Provider_Abstract {
     protected $_sessionLiveTime = 86400;
     
     /**
+     * @var array Errors
+     */
+    protected $_errors = array(); 
+    
+    /**
      * Object constructor method
      * @param array $config
      */
@@ -187,6 +192,13 @@ abstract class SAuth_Provider_Abstract {
     }    
     
     /**
+     * Getting errors array
+     */
+    public function getErrors() {
+        return $this->_errors;
+    }
+    
+    /**
      * Getting token access from session storage
      * @return false|string
      */
@@ -244,5 +256,15 @@ abstract class SAuth_Provider_Abstract {
         
         $sessionStorage->tokenRequest = null;
         unset($sessionStorage->tokenRequest);
+    }
+    
+    /**
+     * Setting error string
+     * @param string Error message
+     * @return string
+     */
+    protected function _setError($error) {
+            
+        return $this->_errors[] = trim($error);
     }
 }
