@@ -80,7 +80,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
                 //facebook return 400 http code on error
                 switch  ($response->getStatus()) {
                     case '400':
-                        $parsedErrors = Zend_Json::decode($response->getBody());
+                        $parsedErrors = $this->parseResponseJson($response->getBody());
                         $this->_setError($parsedErrors['error']['message']);
                         break;
                     default:
@@ -91,7 +91,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
                 return false;
             } elseif ($response->isSuccessful()) {
                 
-                $parsedResponse = $this->_parseResponse($response->getBody());
+                $parsedResponse = $this->parseResponseUrl($response->getBody());
                 $this->_setTokenAccess($parsedResponse['access_token']);
                 //try to get user data
                 if ($userParameters = $this->requestUserParams()) {
@@ -148,38 +148,12 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
             $client->setParameterGet(array('access_token' => $accessToken));
             $response = $client->request(Zend_Http_Client::GET);
             if ($response->isError()) {
-                $parsedErrors = Zend_Json::decode($response->getBody());
+                $parsedErrors = (array) $this->parseResponseJson($response->getBody());
                 $this->_setError($parsedErrors['error']['message']);
                 return false;
             } elseif ($response->isSuccessful()) {
-                return Zend_Json::decode($response->getBody());
+                return $this->parseResponseJson($response->getBody());
             }
-        }
-        return false;
-    }
-    
-    /**
-     * Parse url
-     * @param string $body
-     * @return array
-     */
-    protected function _parseResponse($body) {
-        
-        if (is_string($body) && !empty($body)) {
-            $body = trim($body);
-            $pairs = explode('&', $body);
-            $parsed = array();
-            if (is_array($pairs)) {
-                foreach ($pairs as $pair) {
-                    if (!empty($pair)) {
-                        list($key, $value) = explode('=', $pair, 2);
-                        if (!empty($key) && !empty($value)) {
-                            $parsed[$key] = $value;
-                        }
-                    }
-                }
-            }
-            return $parsed;
         }
         return false;
     }

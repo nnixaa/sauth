@@ -47,8 +47,8 @@ class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_
             require_once 'SAuth/Exception.php';
             throw new SAuth_Exception('Vkontakte auth configuration not specifed.');
         }
-        $appCookie = isset($_COOKIE['vk_app_' . $apiId]) ? $this->_parseResponse($_COOKIE['vk_app_' . $apiId]) : null;
-        $vkUserCookie = isset($_COOKIE['vk_user_info_' . $apiId]) ? $this->_parseResponse($_COOKIE['vk_user_info_' . $apiId]) : null;
+        $appCookie = isset($_COOKIE['vk_app_' . $apiId]) ? $this->parseResponseUrl($_COOKIE['vk_app_' . $apiId]) : null;
+        $vkUserCookie = isset($_COOKIE['vk_user_info_' . $apiId]) ? $this->parseResponseUrl($_COOKIE['vk_user_info_' . $apiId]) : null;
         if (!empty($appCookie)) {
             //create sign
             $sign = 'expire=' . $appCookie['expire'] . 'mid=' . $appCookie['mid'] . 'secret=' . $appCookie['secret']
@@ -81,29 +81,4 @@ class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_
         return $id > 0 ? $id : false;
     }
     
-    /**
-     * Parse url
-     * @param string $body
-     * @return array
-     */
-    protected function _parseResponse($body) {
-        if (is_string($body) && !empty($body)) {
-            $body = trim($body);
-            $pairs = explode('&', $body);
-            $parsed = array();
-            if (is_array($pairs)) {
-                foreach ($pairs as $pair) {
-                    if (!empty($pair)) {
-                        list($key, $value) = explode('=', $pair, 2);
-                        if (!empty($key) && !empty($value)) {
-                            $parsed[$key] = $value;
-                        }
-                    }
-                }
-            }
-            return $parsed;
-        }
-        return false;
-    }
-
 }

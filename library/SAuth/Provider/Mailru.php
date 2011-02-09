@@ -80,7 +80,7 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
                 //mail.ru return 400 http code on error
                 switch  ($response->getStatus()) {
                     case '400':
-                        $parsedErrors = Zend_Json::decode($response->getBody());
+                        $parsedErrors = $this->parseResponseJson($response->getBody());
                         $this->_setError($parsedErrors['error']);
                         break;
                     default:
@@ -91,7 +91,7 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
                 return false;
             } elseif ($response->isSuccessful()) {
                 
-                $parsedResponse = $this->_parseResponse($response->getBody());
+                $parsedResponse = $this->parseResponseJson($response->getBody());
                 $this->_setTokenAccess($parsedResponse['access_token']);
                 $this->setUserParameters($parsedResponse);
                 if ($userParameters = $this->requestUserParams()) {
@@ -158,11 +158,11 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             $client->setParameterPost($requestParametrs);
             $response = $client->request(Zend_Http_Client::POST);
             if ($response->isError()) {
-                $parsedErrors = (array) Zend_Json::decode($response->getBody());
+                $parsedErrors = (array) $this->parseResponseJson($response->getBody());
                 $this->_setError($parsedErrors['error']['error_msg']);
                 return false;
             } elseif ($response->isSuccessful()) {
-                $parsedResponse = (array) Zend_Json::decode($response->getBody());
+                $parsedResponse = (array) $this->parseResponseJson($response->getBody());
                 return isset($parsedResponse[0]) ? $parsedResponse[0] : false;
             }
         }
@@ -186,17 +186,4 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
         }
         return md5($params . $consumerSecret);
     }    
-    
-    /**
-     * Parse response
-     * @param string $body
-     * @return array|false
-     */
-    protected function _parseResponse($body) {
-        
-        if (is_string($body) && !empty($body)) {
-            return Zend_Json::decode($body);
-        }
-        return false;
-    }
 }

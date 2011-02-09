@@ -80,7 +80,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
                 //foursquare return 400 http code on error
                 switch  ($response->getStatus()) {
                     case '400':
-                        $parsedErrors = Zend_Json::decode($response->getBody());
+                        $parsedErrors = $this->parseResponseJson($response->getBody());
                         $this->_setError($parsedErrors['error']);
                         break;
                     default:
@@ -91,7 +91,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
                 return false;
             } elseif ($response->isSuccessful()) {
                 
-                $parsedResponse = $this->_parseResponse($response->getBody());
+                $parsedResponse = $this->parseResponseJson($response->getBody());
                 $this->_setTokenAccess($parsedResponse['access_token']);
                 //try to get user data
                 if ($userParameters = $this->requestUserParams()) {
@@ -130,7 +130,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
     }
     
     /**
-     * Request user params on facebook using Graph API
+     * Request user params on foursquare
      * @return array User params
      */
     public function requestUserParams() {
@@ -149,27 +149,13 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
             $client->setParameterGET(array('oauth_token' => $accessToken));
             $response = $client->request(Zend_Http_Client::GET);
             if ($response->isError()) {
-                $parsedErrors = (array) Zend_Json::decode($response->getBody());
+                $parsedErrors = (array) $this->parseResponseJson($response->getBody());
                 $this->_setError($parsedErrors['meta']['errorDetail']);
                 return false;
             } elseif ($response->isSuccessful()) {
-                $parsedResponse = (array) Zend_Json::decode($response->getBody());
+                $parsedResponse = (array) $this->parseResponseJson($response->getBody());
                 return isset($parsedResponse['response']['user']) ? $parsedResponse['response']['user'] : false;
             }
-        }
-        return false;
-    }
-    
-    /**
-     * Parse response
-     * @param string $body
-     * @return array|false
-     */
-    protected function _parseResponse($body) {
-            
-        $body = trim($body);
-        if (is_string($body) && !empty($body)) {
-            return (array) Zend_Json::decode($body);
         }
         return false;
     }

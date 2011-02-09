@@ -66,7 +66,7 @@ class SAuth_Provider_Twitter extends SAuth_Provider_Abstract implements SAuth_Pr
                 $this->_setError('Twitter Oauth service unavailable');
                 return false;
             } elseif ($response->isSuccessful()) {
-                $parsedResponse = $this->_parseResponse($response->getBody());
+                $parsedResponse = $this->parseResponseUrl($response->getBody());
                 $this->_setTokenAccess($parsedResponse['oauth_token']);
                 $this->setUserParameters($parsedResponse);
                 $this->_unsetTokenRequest();
@@ -89,31 +89,6 @@ class SAuth_Provider_Twitter extends SAuth_Provider_Abstract implements SAuth_Pr
         
         $id = (int) $this->getUserParameters('user_id');
         return $id > 0 ? $id : false;
-    }
-    
-    /**
-     * Parse url
-     * @param string $body
-     * @return array
-     */
-    protected function _parseResponse($body) {
-        if (is_string($body) && !empty($body)) {
-            $body = trim($body);
-            $pairs = explode('&', $body);
-            $parsed = array();
-            if (is_array($pairs)) {
-                foreach ($pairs as $pair) {
-                    if (!empty($pair)) {
-                        list($key, $value) = explode('=', $pair, 2);
-                        if (!empty($key) && !empty($value)) {
-                            $parsed[$key] = $value;
-                        }
-                    }
-                }
-            }
-            return $parsed;
-        }
-        return false;
     }
     
 }

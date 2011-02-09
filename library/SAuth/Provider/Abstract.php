@@ -174,6 +174,38 @@ abstract class SAuth_Provider_Abstract {
         return $this->_errors;
     }
     
+    
+    /**
+     * Parse response url
+     * @param string $url
+     * @return array|false
+     */
+    public function parseResponseUrl($url) {
+
+        $url = (string) trim($url);
+        $pairs = explode('&', $url);
+        
+        $parsed = array();
+        foreach ($pairs as $pair) {
+            list($key, $value) = explode('=', $pair, 2);
+            if (!empty($key) && !empty($value)) {
+                $parsed[$key] = $value;
+            }
+        }
+        return empty($parsed) ? false : $parsed;
+    }
+    
+    /**
+     * Parse response json
+     * @param string $body
+     * @return array|false
+     */
+    public function parseResponseJson($body) {
+            
+        $body = (string) trim($body);
+        return Zend_Json::decode($body);
+    }    
+    
     /** 
      * Setting session key
      * After setSession key you must reset session storage calling setUpSessionStorage
