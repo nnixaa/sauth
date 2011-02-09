@@ -25,7 +25,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
         'callbackUrl' => '',
         'userAuthorizationUrl' => 'http://www.facebook.com/dialog/oauth',
         'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-        'requestDatarUrl' => 'https://graph.facebook.com',
+        'requestDatarUrl' => 'https://graph.facebook.com/me',
         'scope' => array(),
     );
     
@@ -81,12 +81,13 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
                 switch  ($response->getStatus()) {
                     case '400':
                         $parsedErrors = Zend_Json::decode($response->getBody());
-                        $error = $parsedErrors['error']['message'];
+                        $this->_setError($parsedErrors['error']['message']);
                         break;
                     default:
-                        $error = 'OAuth service unavailable.';
+                        $this->_setError('Facebook Oauth service unavailable');
                         break;
                 }
+
                 return false;
             } elseif ($response->isSuccessful()) {
                 
@@ -113,7 +114,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
             header('Location: ' . $url);
             exit(1);
         } else {
-            $error = $_GET['error'];
+            $this->_setError($_GET['error']);
             return false;
         }
     }
@@ -143,12 +144,12 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
 
         if ($accessToken && !empty($graphUrl)) {
             $client = new Zend_Http_Client();
-            $url = $graphUrl . '/me';
-            $client->setUri($url);
-            $client->setParameterGET(array('access_token' => $accessToken));
+            $client->setUri($graphUrl);
+            $client->setParameterGet(array('access_token' => $accessToken));
             $response = $client->request(Zend_Http_Client::GET);
             if ($response->isError()) {
-                $error = 'Request user parameters failed.';
+                $parsedErrors = Zend_Json::decode($response->getBody());
+                $this->_setError($parsedErrors['error']['message']);
                 return false;
             } elseif ($response->isSuccessful()) {
                 return Zend_Json::decode($response->getBody());
@@ -163,6 +164,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
      * @return array
      */
     protected function _parseResponse($body) {
+        
         if (is_string($body) && !empty($body)) {
             $body = trim($body);
             $pairs = explode('&', $body);

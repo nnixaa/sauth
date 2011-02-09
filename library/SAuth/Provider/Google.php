@@ -64,6 +64,7 @@ class SAuth_Provider_Google extends SAuth_Provider_Abstract implements SAuth_Pro
                 $this->setUserParameters($_GET);
                 return $this->isAuthorized();
             } else {
+                $this->_setError('Google openId verification has been faild');
                 return false;
             }
         }

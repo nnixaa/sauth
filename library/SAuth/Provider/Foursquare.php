@@ -81,10 +81,10 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
                 switch  ($response->getStatus()) {
                     case '400':
                         $parsedErrors = Zend_Json::decode($response->getBody());
-                        $error = $parsedErrors['error'];
+                        $this->_setError($parsedErrors['error']);
                         break;
                     default:
-                        $error = 'OAuth service unavailable.';
+                        $this->_setError('Foursquare Oauth service unavailable');
                         break;
                 }
 
@@ -113,7 +113,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
             header('Location: ' . $url);
             exit(1);
         } else {
-            $error = $_GET['error'];
+            $this->_setError($_GET['error']);
             return false;
         }
         
@@ -150,7 +150,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
             $response = $client->request(Zend_Http_Client::GET);
             if ($response->isError()) {
                 $parsedErrors = (array) Zend_Json::decode($response->getBody());
-                $error = $parsedErrors['meta']['errorDetail'];
+                $this->_setError($parsedErrors['meta']['errorDetail']);
                 return false;
             } elseif ($response->isSuccessful()) {
                 $parsedResponse = (array) Zend_Json::decode($response->getBody());

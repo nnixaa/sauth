@@ -62,14 +62,8 @@ class SAuth_Provider_Twitter extends SAuth_Provider_Abstract implements SAuth_Pr
             $response = $tokenAccess->getResponse();
             
             if ($response->isError()) {
-                switch  ($response->getStatus()) {
-                    case '400':
-                        $error = 'Error has occurred.';
-                        break;
-                    default:
-                        $error = 'OAuth service unavailable.';
-                        break;
-                }
+                //TODO:change on custom
+                $this->_setError('Twitter Oauth service unavailable');
                 return false;
             } elseif ($response->isSuccessful()) {
                 $parsedResponse = $this->_parseResponse($response->getBody());

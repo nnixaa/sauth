@@ -77,9 +77,18 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             $client->setParameterPost($accessConfig);
             $response = $client->request(Zend_Http_Client::POST);
             if ($response->isError()) {
-                $error = 'OAuth service unavailable.';
-                return false;
+                //mail.ru return 400 http code on error
+                switch  ($response->getStatus()) {
+                    case '400':
+                        $parsedErrors = Zend_Json::decode($response->getBody());
+                        $this->_setError($parsedErrors['error']);
+                        break;
+                    default:
+                        $this->_setError('Mail.ru Oauth service unavailable');
+                        break;
+                }
                 
+                return false;
             } elseif ($response->isSuccessful()) {
                 
                 $parsedResponse = $this->_parseResponse($response->getBody());
@@ -103,7 +112,7 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             header('Location: ' . $url);
             exit(1);
         } else {
-            $error = $_GET['error'];
+            $this->_setError($_GET['error']);
             return false;
         }
     }
@@ -150,7 +159,7 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             $response = $client->request(Zend_Http_Client::POST);
             if ($response->isError()) {
                 $parsedErrors = (array) Zend_Json::decode($response->getBody());
-                $error = $parsedErrors['error']['error_msg'];
+                $this->_setError($parsedErrors['error']['error_msg']);
                 return false;
             } elseif ($response->isSuccessful()) {
                 $parsedResponse = (array) Zend_Json::decode($response->getBody());
