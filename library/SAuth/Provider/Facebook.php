@@ -10,7 +10,8 @@ require_once 'SAuth/Provider/Interface.php';
 require_once 'Zend/Http/Client.php';
 
 /**
- * Authorisation with facebook
+ * Authentication with facebook
+ * 
  * http://developers.facebook.com/docs/authentication
  */
 class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
@@ -35,13 +36,16 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
     protected $_sessionKey = 'SAUTH_FACEBOOK';
     
     /**
-     * Authorized user by facebook OAuth 2.0
-     * @param array $config
+     * Authenticate user by facebook OAuth 2.0
      * @return true
      */
-    public function auth(array $config = array()) {
+    public function authenticate() {
         
-        $config = $this->setConfig($config);
+        if ($this->isAuthorized()) {
+            $this->clearAuth();
+        }
+        
+        $config = $this->getConfig();
         
         $authorizationUrl = $config['userAuthorizationUrl'];
         $accessTokenUrl = $config['accessTokenUrl'];

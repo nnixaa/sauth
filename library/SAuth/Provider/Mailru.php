@@ -11,7 +11,8 @@ require_once 'Zend/Http/Client.php';
 
 
 /**
- * Authorisation with mail.ru
+ * Authentication with mail.ru
+ * 
  * http://api.mail.ru/docs/guides/oauth/sites/
  * http://api.mail.ru/sites/my/
  * http://api.mail.ru/docs/guides/restapi/
@@ -38,13 +39,16 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
     protected $_sessionKey = 'SAUTH_MAILRU';
     
     /**
-     * Authorized user by facebook OAuth 2.0
-     * @param array $config
+     * Authenticate user by mail.ru OAuth 2.0
      * @return true
      */
-    public function auth(array $config = array()) {
+    public function authenticate() {
         
-        $config = $this->setConfig($config);
+        if ($this->isAuthorized()) {
+            $this->clearAuth();
+        }
+        
+        $config = $this->getConfig();
         
         $authorizationUrl = $config['userAuthorizationUrl'];
         $accessTokenUrl = $config['accessTokenUrl'];

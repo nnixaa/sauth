@@ -60,27 +60,27 @@ class IndexController extends Zend_Controller_Action {
         switch ($authBy) {
             case 'google':
                 $googleAuth = new SAuth_Provider_Google($this->config['google']);
-                $this->view->auth = $googleAuth->auth();
+                $this->view->auth = $googleAuth->authenticate();
                 break;
             case 'twitter':
                 $twitterAuth = new SAuth_Provider_Twitter($this->config['twitter']);
-                $this->view->auth = $twitterAuth->auth();
+                $this->view->auth = $twitterAuth->authenticate();
                 break;
             case 'facebook':
                 $facebookAuth = new SAuth_Provider_Facebook($this->config['facebook']);
-                $this->view->auth = $facebookAuth->auth();
+                $this->view->auth = $facebookAuth->authenticate();
                 break;
             case 'vkontakte':
                 $vkontakteAuth = new SAuth_Provider_Vkontakte($this->config['vkontakte']);
-                $this->view->auth = $vkontakteAuth->auth();
+                $this->view->auth = $vkontakteAuth->authenticate();
                 break;
             case 'mailru':
                 $mailruAuth = new SAuth_Provider_Mailru($this->config['mailru']);
-                $this->view->auth = $mailruAuth->auth();
+                $this->view->auth = $mailruAuth->authenticate();
                 break;
             case 'foursquare':
                 $foursquareAuth = new SAuth_Provider_Foursquare($this->config['foursquare']);
-                $this->view->auth = $foursquareAuth->auth();
+                $this->view->auth = $foursquareAuth->authenticate();
                 break;
         }
     }

@@ -11,7 +11,8 @@ require_once 'Zend/Oauth/Consumer.php';
 
 
 /**
- * Authorisation with twitter
+ * Authentication with twitter
+ * 
  * http://developer.twitter.com/pages/auth
  */
 class SAuth_Provider_Twitter extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
@@ -36,17 +37,17 @@ class SAuth_Provider_Twitter extends SAuth_Provider_Abstract implements SAuth_Pr
     protected $_sessionKey = 'SAUTH_TWITTER';
     
     /**
-     * Authorized user by twitter OAuth
-     * @param array $config
+     * Authenticate user by twitter OAuth
      * @return true
      */
-    public function auth(array $config = array()) {
+    public function authenticate() {
         
         if ($this->isAuthorized()) {
-            return true;
+            $this->clearAuth();
         }
         
-        $config = $this->setConfig($config);
+        $config = $this->getConfig();
+        
         if (empty($config['consumerKey']) || empty($config['consumerSecret']) || empty($config['userAuthorizationUrl']) 
             || empty($config['accessTokenUrl']) || empty($config['callbackUrl'])) {
                 

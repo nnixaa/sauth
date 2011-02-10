@@ -7,7 +7,8 @@ require_once 'SAuth/Provider/Abstract.php';
 require_once 'SAuth/Provider/Interface.php';
 
 /**
- * Authorisation with vkontakte
+ * Authentication with vkontakte
+ * 
  * http://vkontakte.ru/developers.php?o=-1&p=Open+API
  */
 class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
@@ -27,17 +28,16 @@ class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_
     protected $_sessionKey = 'SAUTH_VKONTAKTE';
     
     /**
-     * Authorized user
-     * @param array $config
+     * Authenticate user
      * @return true
      */
-    public function auth(array $config = array()) {
+    public function authenticate() {
         
         if ($this->isAuthorized()) {
-            return true;
+            $this->clearAuth();
         }
         
-        $config = $this->setConfig($config);
+        $config = $this->getConfig();
         
         $apiId = $config['consumerId'];
         $apiSecret = $config['consumerSecret'];

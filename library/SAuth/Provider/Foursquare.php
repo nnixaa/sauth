@@ -11,7 +11,8 @@ require_once 'Zend/Http/Client.php';
 
 
 /**
- * Authorisation with foursquare
+ * Authentication with foursquare
+ * 
  * http://developer.foursquare.com/docs/oauth.html
  */
 class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
@@ -37,13 +38,16 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
     protected $_sessionKey = 'SAUTH_FOURSQUARE';
     
     /**
-     * Authorized user by facebook OAuth 2.0
-     * @param array $config
+     * Authenticate user by foursquare OAuth 2.0
      * @return true
      */
-    public function auth(array $config = array()) {
+    public function authenticate() {
         
-        $config = $this->setConfig($config);
+        if ($this->isAuthorized()) {
+            $this->clearAuth();
+        }
+        
+        $config = $this->getConfig();
         
         $authorizationUrl = $config['userAuthorizationUrl'];
         $accessTokenUrl = $config['accessTokenUrl'];
