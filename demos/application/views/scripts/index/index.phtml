@@ -42,7 +42,7 @@
     </style>
 </head>
 <body>
-    <?php if (!$this->isAuth):?>
+    <?php if (!$this->auth):?>
        <h1>Login via:</h1>
        <a href="#" onclick="login('google');return false;"><img src="/img/google.png" /></a>
        <a href="#" onclick="login('twitter');return false;"><img src="/img/twitter.png" /></a>
@@ -52,8 +52,7 @@
        <a href="#" onclick="login('foursquare');return false;"><img src="/img/foursquare.png" /></a>
     <?php else:?>
        <a href="/index/logout" onclick="">Logout</a>
-       <div><strong>ID:</strong> <?php echo $this->id;?></div>
-       <div><strong>Login:</strong> <?php echo $this->login;?></div>
+       <div><strong>Parameters:</strong><pre> <?php print_r($this->parameters);?></pre></div>
     <?php endif;?>
 </body>
 </html>
