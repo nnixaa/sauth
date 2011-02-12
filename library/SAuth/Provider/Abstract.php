@@ -207,6 +207,19 @@ abstract class SAuth_Provider_Abstract {
      */
     public function httpRequest($type, $url, $parameters) {
         
+        $client = new Zend_Http_Client();
+        $client->setUri($url);
+        
+        if ($type == Zend_Http_Client::GET) {
+            
+            $client->setParameterGet($parameters);
+            
+        } elseif ($type == Zend_Http_Client::POST) {
+            
+            $client->setParameterPost($parameters);
+        }
+        
+        return $client->request($type);
     }
     
     /**

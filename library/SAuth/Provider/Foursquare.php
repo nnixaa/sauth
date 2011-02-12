@@ -11,7 +11,8 @@ require_once 'Zend/Http/Client.php';
 
 
 /**
- * Authorisation with foursquare
+ * Authentication with foursquare
+ * 
  * http://developer.foursquare.com/docs/oauth.html
  */
 class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
@@ -26,7 +27,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
         'callbackUrl' => '',
         'userAuthorizationUrl' => 'https://foursquare.com/oauth2/authorize',
         'accessTokenUrl' => 'https://foursquare.com/oauth2/access_token',
-        'requestDatarUrl' => 'https://api.foursquare.com/v2',
+        'requestDatarUrl' => 'https://api.foursquare.com/v2/users/self',
         'responseType' => 'code',
         
     );
@@ -37,13 +38,16 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
     protected $_sessionKey = 'SAUTH_FOURSQUARE';
     
     /**
-     * Authorized user by facebook OAuth 2.0
-     * @param array $config
+     * Authenticate user by foursquare OAuth 2.0
      * @return true
      */
-    public function auth(array $config = array()) {
+    public function authenticate() {
         
-        $config = $this->setConfig($config);
+        if ($this->isAuthorized()) {
+            $this->clearAuth();
+        }
+        
+        $config = $this->getConfig();
         
         $authorizationUrl = $config['userAuthorizationUrl'];
         $accessTokenUrl = $config['accessTokenUrl'];
@@ -71,10 +75,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
 
             );
             
-            $client = new Zend_Http_Client();
-            $client->setUri($accessTokenUrl);
-            $client->setParameterPost($accessConfig);
-            $response = $client->request(Zend_Http_Client::POST);
+            $response = $this->httpRequest('POST', $accessTokenUrl, $accessConfig);
             
             if ($response->isError()) {
                 //foursquare return 400 http code on error
@@ -143,11 +144,9 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
         $accessToken = $this->_getTokenAccess();
 
         if ($accessToken && !empty($apiUrl)) {
-            $client = new Zend_Http_Client();
-            $url = $apiUrl . '/users/self';
-            $client->setUri($url);
-            $client->setParameterGET(array('oauth_token' => $accessToken));
-            $response = $client->request(Zend_Http_Client::GET);
+            
+            $response = $this->httpRequest('GET', $apiUrl, array('oauth_token' => $accessToken));
+            
             if ($response->isError()) {
                 $parsedErrors = (array) $this->parseResponseJson($response->getBody());
                 $this->_setError($parsedErrors['meta']['errorDetail']);

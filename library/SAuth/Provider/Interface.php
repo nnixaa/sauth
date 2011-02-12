@@ -6,11 +6,10 @@
 interface SAuth_Provider_Interface {
     
     /**
-     * Authorized user
-     * @param array $config
+     * Authenticate user
      * @return true
      */
-    public function auth(array $config = array());    
+    public function authenticate();    
     
     /**
      * Returns authorization flag

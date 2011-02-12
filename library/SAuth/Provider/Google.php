@@ -13,7 +13,8 @@ require_once 'SAuth/Provider/Google/Extension.php';
 require_once 'Ak33m/OpenId/Consumer.php';
 
 /**
- * Authorisation with google
+ * Authentication with google
+ * 
  * http://code.google.com/apis/accounts/docs/OpenID.html
  */
 class SAuth_Provider_Google extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
@@ -34,13 +35,17 @@ class SAuth_Provider_Google extends SAuth_Provider_Abstract implements SAuth_Pro
     protected $_sessionKey = 'SAUTH_GOOGLE';
     
     /**
-     * Authorized user by google OpenId
-     * @param array $config
+     * Authenticate user by google OpenId
      * @return true
      */
-    public function auth(array $config = array()) {
+    public function authenticate() {
         
-        $config = $this->setConfig($config);
+        if ($this->isAuthorized()) {
+            $this->clearAuth();
+        }
+        
+        $config = $this->getConfig();
+        
         if (empty($config['id'])) {
             
             require_once 'SAuth/Exception.php';

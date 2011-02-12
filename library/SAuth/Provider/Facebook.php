@@ -10,7 +10,8 @@ require_once 'SAuth/Provider/Interface.php';
 require_once 'Zend/Http/Client.php';
 
 /**
- * Authorisation with facebook
+ * Authentication with facebook
+ * 
  * http://developers.facebook.com/docs/authentication
  */
 class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
@@ -35,13 +36,16 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
     protected $_sessionKey = 'SAUTH_FACEBOOK';
     
     /**
-     * Authorized user by facebook OAuth 2.0
-     * @param array $config
+     * Authenticate user by facebook OAuth 2.0
      * @return true
      */
-    public function auth(array $config = array()) {
+    public function authenticate() {
         
-        $config = $this->setConfig($config);
+        if ($this->isAuthorized()) {
+            $this->clearAuth();
+        }
+        
+        $config = $this->getConfig();
         
         $authorizationUrl = $config['userAuthorizationUrl'];
         $accessTokenUrl = $config['accessTokenUrl'];
@@ -55,6 +59,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
             require_once 'SAuth/Exception.php';    
             throw new SAuth_Exception('Facebook auth configuration not specifed.');
         }
+
         if (isset($config['scope']) && !empty($config['scope'])) {
             $scope = $config['scope'];
         }
@@ -71,10 +76,8 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
             if (isset($scope)) {
                 $accessConfig['scope'] = implode($scope, ',');
             }
-            $client = new Zend_Http_Client();
-            $client->setUri($accessTokenUrl);
-            $client->setParameterPost($accessConfig);
-            $response = $client->request(Zend_Http_Client::POST);
+            
+            $response = $this->httpRequest('POST', $accessTokenUrl, $accessConfig);
             
             if ($response->isError()) {
                 //facebook return 400 http code on error
@@ -89,6 +92,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
                 }
 
                 return false;
+                
             } elseif ($response->isSuccessful()) {
                 
                 $parsedResponse = $this->parseResponseUrl($response->getBody());
@@ -98,6 +102,7 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
                     $this->setUserParameters($userParameters);
                 }
                 return $this->isAuthorized();
+                
             }
         } elseif (!isset($_GET['error'])) {
             
@@ -105,17 +110,21 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
                 'client_id' => $clientId, 
                 'redirect_uri' => $redirectUrl,
             );
+            
             if (isset($scope)) {
                 $authorizationConfig['scope'] = implode($scope, ',');
             }
-            // TODO: maybe http_build_url ?
+            
             $url = $authorizationUrl . '?';
             $url .= http_build_query($authorizationConfig, null, '&');
             header('Location: ' . $url);
             exit(1);
+            
         } else {
+            
             $this->_setError($_GET['error']);
             return false;
+            
         }
     }
     
@@ -143,10 +152,9 @@ class SAuth_Provider_Facebook extends SAuth_Provider_Abstract implements SAuth_P
         $accessToken = $this->_getTokenAccess();
 
         if ($accessToken && !empty($graphUrl)) {
-            $client = new Zend_Http_Client();
-            $client->setUri($graphUrl);
-            $client->setParameterGet(array('access_token' => $accessToken));
-            $response = $client->request(Zend_Http_Client::GET);
+            
+            $response = $this->httpRequest('GET', $graphUrl, array('access_token' => $accessToken));
+            
             if ($response->isError()) {
                 $parsedErrors = (array) $this->parseResponseJson($response->getBody());
                 $this->_setError($parsedErrors['error']['message']);

@@ -7,7 +7,8 @@ require_once 'SAuth/Provider/Abstract.php';
 require_once 'SAuth/Provider/Interface.php';
 
 /**
- * Authorisation with vkontakte
+ * Authentication with vkontakte
+ * 
  * http://vkontakte.ru/developers.php?o=-1&p=Open+API
  */
 class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
@@ -27,17 +28,16 @@ class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_
     protected $_sessionKey = 'SAUTH_VKONTAKTE';
     
     /**
-     * Authorized user
-     * @param array $config
+     * Authenticate user
      * @return true
      */
-    public function auth(array $config = array()) {
+    public function authenticate() {
         
         if ($this->isAuthorized()) {
-            return true;
+            $this->clearAuth();
         }
         
-        $config = $this->setConfig($config);
+        $config = $this->getConfig();
         
         $apiId = $config['consumerId'];
         $apiSecret = $config['consumerSecret'];
@@ -49,12 +49,15 @@ class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_
         }
         $appCookie = isset($_COOKIE['vk_app_' . $apiId]) ? $this->parseResponseUrl($_COOKIE['vk_app_' . $apiId]) : null;
         $vkUserCookie = isset($_COOKIE['vk_user_info_' . $apiId]) ? $this->parseResponseUrl($_COOKIE['vk_user_info_' . $apiId]) : null;
+        
         if (!empty($appCookie)) {
             //create sign
             $sign = 'expire=' . $appCookie['expire'] . 'mid=' . $appCookie['mid'] . 'secret=' . $appCookie['secret']
                 . 'sid=' . $appCookie['sid'];
             $sign =  md5($sign . $apiSecret);
+            
             if ($appCookie['sig'] == $sign) {
+                
                 $this->_setTokenAccess($sign);
                 $this->setUserParameters((array) $appCookie);
                 $this->setUserParameters((array) $vkUserCookie);
