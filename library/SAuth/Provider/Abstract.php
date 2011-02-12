@@ -212,11 +212,11 @@ abstract class SAuth_Provider_Abstract {
         
         if ($type == Zend_Http_Client::GET) {
             
-            $client->setParametersGet($parameters);
+            $client->setParameterGet($parameters);
             
         } elseif ($type == Zend_Http_Client::POST) {
             
-            $client->setParametersPost($parameters);
+            $client->setParameterPost($parameters);
         }
         
         return $client->request($type);

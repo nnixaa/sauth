@@ -76,10 +76,8 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
                 'grant_type' => 'authorization_code',
             );
             
-            $client = new Zend_Http_Client();
-            $client->setUri($accessTokenUrl);
-            $client->setParameterPost($accessConfig);
-            $response = $client->request(Zend_Http_Client::POST);
+            $response = $this->httpRequest('POST', $accessTokenUrl, $accessConfig);
+            
             if ($response->isError()) {
                 //mail.ru return 400 http code on error
                 switch  ($response->getStatus()) {
@@ -148,8 +146,7 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
         $config = $this->getConfig();
         
         if ($accessToken && !empty($restUrl)) {
-            $client = new Zend_Http_Client();
-            $client->setUri($restUrl);
+
             $requestParametrs = array(
                 'app_id' => $config['consumerId'],
                 'method' => 'users.getInfo',
@@ -159,8 +156,8 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             $sig = $this->getSign($requestParametrs);
             $requestParametrs['sig'] = $sig;
             
-            $client->setParameterPost($requestParametrs);
-            $response = $client->request(Zend_Http_Client::POST);
+            $response = $this->httpRequest('POST', $restUrl, $requestParametrs);
+            
             if ($response->isError()) {
                 $parsedErrors = (array) $this->parseResponseJson($response->getBody());
                 $this->_setError($parsedErrors['error']['error_msg']);

@@ -49,12 +49,15 @@ class SAuth_Provider_Vkontakte extends SAuth_Provider_Abstract implements SAuth_
         }
         $appCookie = isset($_COOKIE['vk_app_' . $apiId]) ? $this->parseResponseUrl($_COOKIE['vk_app_' . $apiId]) : null;
         $vkUserCookie = isset($_COOKIE['vk_user_info_' . $apiId]) ? $this->parseResponseUrl($_COOKIE['vk_user_info_' . $apiId]) : null;
+        
         if (!empty($appCookie)) {
             //create sign
             $sign = 'expire=' . $appCookie['expire'] . 'mid=' . $appCookie['mid'] . 'secret=' . $appCookie['secret']
                 . 'sid=' . $appCookie['sid'];
             $sign =  md5($sign . $apiSecret);
+            
             if ($appCookie['sig'] == $sign) {
+                
                 $this->_setTokenAccess($sign);
                 $this->setUserParameters((array) $appCookie);
                 $this->setUserParameters((array) $vkUserCookie);

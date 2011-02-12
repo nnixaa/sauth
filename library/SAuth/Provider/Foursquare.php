@@ -27,7 +27,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
         'callbackUrl' => '',
         'userAuthorizationUrl' => 'https://foursquare.com/oauth2/authorize',
         'accessTokenUrl' => 'https://foursquare.com/oauth2/access_token',
-        'requestDatarUrl' => 'https://api.foursquare.com/v2',
+        'requestDatarUrl' => 'https://api.foursquare.com/v2/users/self',
         'responseType' => 'code',
         
     );
@@ -75,10 +75,7 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
 
             );
             
-            $client = new Zend_Http_Client();
-            $client->setUri($accessTokenUrl);
-            $client->setParameterPost($accessConfig);
-            $response = $client->request(Zend_Http_Client::POST);
+            $response = $this->httpRequest('POST', $accessTokenUrl, $accessConfig);
             
             if ($response->isError()) {
                 //foursquare return 400 http code on error
@@ -147,11 +144,9 @@ class SAuth_Provider_Foursquare extends SAuth_Provider_Abstract implements SAuth
         $accessToken = $this->_getTokenAccess();
 
         if ($accessToken && !empty($apiUrl)) {
-            $client = new Zend_Http_Client();
-            $url = $apiUrl . '/users/self';
-            $client->setUri($url);
-            $client->setParameterGET(array('oauth_token' => $accessToken));
-            $response = $client->request(Zend_Http_Client::GET);
+            
+            $response = $this->httpRequest('GET', $apiUrl, array('oauth_token' => $accessToken));
+            
             if ($response->isError()) {
                 $parsedErrors = (array) $this->parseResponseJson($response->getBody());
                 $this->_setError($parsedErrors['meta']['errorDetail']);
