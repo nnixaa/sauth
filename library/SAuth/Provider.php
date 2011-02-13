@@ -12,6 +12,13 @@ class SAuth_Provider {
     const MAILRU = 'SAuth_Provider_Mailru';
     const VKONTAKTE = 'SAuth_Provider_Vkontakte';
     
+    
+    /**
+     * Instance of object
+     * @var SAuth_Provider
+     */
+    protected static $_instance = null;
+    
     /**
      * @var Zend_Session_Namespace
      */
@@ -20,22 +27,41 @@ class SAuth_Provider {
     /**
      * @var string Current provider class name
      */
-    protected static $_currentProviderName = '';
+    protected $_currentProviderName = '';
     
     /**
      * @var SAuth_Provider
      */
-    protected static $_currentProviderObject = null;
+    protected $_currentProviderObject = null;
     
     /**
      * @var bool
      */
     protected $_isSetuped = false;
     
+    
     /**
-     * Object constructor method
+     * Returns an instance of SAuth_Provider
+     * @return SAuth_Provider
      */
-    public function __construct() {
+    public static function getInstance() {
+        
+        if (null === self::$_instance) {
+            self::$_instance = new self();
+        }
+
+        return self::$_instance;
+    }
+    
+    /**
+     * Singleton pattern implementation makes "clone" unavailable
+     */
+    protected function __clone() {}
+    
+    /**
+     * Singleton pattern implementation makes "new" unavailable
+     */
+    protected function __construct() {
         
         $this->_currentProviderStorage = new Zend_Session_Namespace('SAUTH_PROVIDER');
         

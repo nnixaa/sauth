@@ -16,7 +16,7 @@ class IndexController extends Zend_Controller_Action {
         $this->view->vkAppId = $this->config['vkontakte']['consumerId'];
         $this->view->vkAuthUrl = $this->config['vkontakte']['userAuthorizationUrl'];
         
-        $sauthProvider = new SAuth_Provider();
+        $sauthProvider = SAuth_Provider::getInstance();
         if ($sauthProvider->isAuthorized()) {
                 
             $this->view->auth = true;
@@ -33,7 +33,7 @@ class IndexController extends Zend_Controller_Action {
         $provider = $this->getRequest()->getParam('by') ? $this->getRequest()->getParam('by') : 'google';
         $providerClass = 'SAuth_Provider_' . ucfirst($provider);
         
-        $sauthProvider = new SAuth_Provider();
+        $sauthProvider = SAuth_Provider::getInstance();
         $sauthProvider->setUpProvider($providerClass, $this->config[$provider]);
         
         if ($sauthProvider->authenticate()) {
@@ -50,7 +50,7 @@ class IndexController extends Zend_Controller_Action {
     
     public function logoutAction() {
         
-        $sauthProvider = new SAuth_Provider();
+        $sauthProvider = SAuth_Provider::getInstance();
         
         if ($sauthProvider->isAuthorized()) {
             $sauthProvider->getCurrentProvider()->clearAuth();
