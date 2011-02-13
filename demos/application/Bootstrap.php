@@ -9,7 +9,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     }
 
     /**
-     * You should specify your own configuration
+     * TODO: You should specify your own configuration
      */
     protected function _initSauth() {
         
