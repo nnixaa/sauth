@@ -16,4 +16,4 @@ Includes libraries for next social services:
 Demo
 ----
 
-[http://dnixa.tmweb.ru] (http://dnixa.tmweb.ru)
+[http://dnixa.tmweb.ru](http://dnixa.tmweb.ru)
