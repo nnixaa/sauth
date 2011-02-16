@@ -132,6 +132,17 @@ class SAuth_Provider {
         }
         return $this->getCurrentProvider()->authenticate();
     }
+
+    /**
+     * Clear auth
+     */
+    public function clearAuth() {
+        
+        if ($this->isSetuped()) {
+            $this->getCurrentProvider()->clearAuth();
+			$this->_currentProviderStorage->unsetAll();
+        }
+    }
     
     /**
      * Returns current provider object

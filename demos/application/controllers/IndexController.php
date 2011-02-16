@@ -56,12 +56,8 @@ class IndexController extends Zend_Controller_Action {
     public function logoutAction() {
         
         $sauthProvider = SAuth_Provider::getInstance();
-        
-        if ($sauthProvider->isAuthorized()) {
-            $sauthProvider->getCurrentProvider()->clearAuth();
-        }
-        
-        $this->_helper->viewRenderer->setNoRender();
+        $sauthProvider->clearAuth();
+
         $this->getResponse()->setRedirect('/');
     }
 
