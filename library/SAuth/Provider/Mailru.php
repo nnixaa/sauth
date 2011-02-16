@@ -6,10 +6,6 @@ require_once 'SAuth/Provider/Abstract.php';
 /**  SAuth_Provider_Interface */
 require_once 'SAuth/Provider/Interface.php';
 
-/**  Zend_Http_Client */
-require_once 'Zend/Http/Client.php';
-
-
 /**
  * Authentication with mail.ru
  * 
