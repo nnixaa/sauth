@@ -28,6 +28,11 @@ class IndexController extends Zend_Controller_Action {
         }
     }
     
+	/**
+	 * This method will be called twice
+	 * First time when user was opened authentication window
+	 * Second time when social service will redirect user back with success or error
+	 */
     public function authAction() {
             
         $provider = $this->getRequest()->getParam('by') ? $this->getRequest()->getParam('by') : 'google';
