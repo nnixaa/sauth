@@ -6,7 +6,7 @@ require_once 'Zend/Session/Namespace.php';
 /**
  * Abstract class for Sauth libraries
  */
-abstract class SAuth_Provider_Abstract {
+abstract class SAuth_Adapter_Abstract {
     
     /**
      * @var Zend_Session_Namespace Session storage
@@ -27,7 +27,7 @@ abstract class SAuth_Provider_Abstract {
      * Object constructor method
      * @param array $config
      */
-    public function __construct($config = array()) {
+    public function __construct(array $config) {
         
         $this->setConfig($config);
         $this->setUpSessionStorage();
@@ -134,7 +134,7 @@ abstract class SAuth_Provider_Abstract {
      * @param array $config
      * @return array Configuration array
      */
-    public function setConfig(array $config = array()) {
+    public function setConfig(array $config) {
             
         foreach ($config as $key => $value) {
         	

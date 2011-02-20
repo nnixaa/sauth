@@ -1,15 +1,23 @@
 <?php
 
-/**  SAuth_Provider_Abstract */
-require_once 'SAuth/Provider/Abstract.php';
+/**  
+ * @see SAuth_Adapter_Abstract 
+ */
+require_once 'SAuth/Adapter/Abstract.php';
 
-/**  SAuth_Provider_Interface */
-require_once 'SAuth/Provider/Interface.php';
+/**
+ * @see Zend_Auth_Adapter_Interface
+ */
+require_once 'Zend/Auth/Adapter/Interface.php';
 
-/**  SAuth_Provider_Google_Extension */
-require_once 'SAuth/Provider/Google/Extension.php';
+/**  
+ * @see SAuth_Adapter_Google_Extension 
+ */
+require_once 'SAuth/Adapter/Google/Extension.php';
 
-/**  SAuth_Provider_Google_Extension */
+/**  
+ * @see Ak33m_OpenId_Consumer
+ */
 require_once 'Ak33m/OpenId/Consumer.php';
 
 /**
@@ -17,7 +25,7 @@ require_once 'Ak33m/OpenId/Consumer.php';
  * 
  * http://code.google.com/apis/accounts/docs/OpenID.html
  */
-class SAuth_Provider_Google extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
+class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_Adapter_Interface {
 
     /**
      * @var array Configuration array

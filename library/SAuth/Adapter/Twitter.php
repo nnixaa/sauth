@@ -1,12 +1,18 @@
 <?php
 
-/**  SAuth_Provider_Abstract */
-require_once 'SAuth/Provider/Abstract.php';
+/**  
+ * @see SAuth_Adapter_Abstract 
+ */
+require_once 'SAuth/Adapter/Abstract.php';
 
-/**  SAuth_Provider_Interface */
-require_once 'SAuth/Provider/Interface.php';
+/**
+ * @see Zend_Auth_Adapter_Interface
+ */
+require_once 'Zend/Auth/Adapter/Interface.php';
 
-/**  Zend_Oauth_Consumer */
+/**  
+ * @see Zend_Oauth_Consumer 
+ */
 require_once 'Zend/Oauth/Consumer.php';
 
 
@@ -15,7 +21,7 @@ require_once 'Zend/Oauth/Consumer.php';
  * 
  * http://developer.twitter.com/pages/auth
  */
-class SAuth_Provider_Twitter extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
+class SAuth_Adapter_Twitter extends SAuth_Adapter_Abstract implements Zend_Auth_Adapter_Interface {
     
     /**
      * @var array Configuration array

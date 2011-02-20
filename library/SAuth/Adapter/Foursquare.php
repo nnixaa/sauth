@@ -1,41 +1,44 @@
 <?php
 
-/**  SAuth_Provider_Abstract */
-require_once 'SAuth/Provider/Abstract.php';
-
-/**  SAuth_Provider_Interface */
-require_once 'SAuth/Provider/Interface.php';
+/**  
+ * @see SAuth_Adapter_Abstract 
+ */
+require_once 'SAuth/Adapter/Abstract.php';
 
 /**
- * Authentication with mail.ru
- * 
- * http://api.mail.ru/docs/guides/oauth/sites/
- * http://api.mail.ru/sites/my/
- * http://api.mail.ru/docs/guides/restapi/
+ * @see Zend_Auth_Adapter_Interface
  */
-class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Provider_Interface {
+require_once 'Zend/Auth/Adapter/Interface.php';
+
+/**
+ * Authentication with foursquare
+ * 
+ * http://developer.foursquare.com/docs/oauth.html
+ */
+class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Auth_Adapter_Interface {
     
     /**
      * @var array Configuration array
      */
     protected $_config = array(
         'consumerId' => '',
-        'privateKey' => '',
+        'consumerKey' => '',
         'consumerSecret' => '',
         'callbackUrl' => '',
-        'userAuthorizationUrl' => 'https://connect.mail.ru/oauth/authorize',
-        'accessTokenUrl' => 'https://connect.mail.ru/oauth/token',
-        'requestDatarUrl' => 'http://www.appsmail.ru/platform/api',
+        'userAuthorizationUrl' => 'https://foursquare.com/oauth2/authorize',
+        'accessTokenUrl' => 'https://foursquare.com/oauth2/access_token',
+        'requestDatarUrl' => 'https://api.foursquare.com/v2/users/self',
         'responseType' => 'code',
+        
     );
     
     /**
      * @var string Session key
      */
-    protected $_sessionKey = 'SAUTH_MAILRU';
+    protected $_sessionKey = 'SAUTH_FOURSQUARE';
     
     /**
-     * Authenticate user by mail.ru OAuth 2.0
+     * Authenticate user by foursquare OAuth 2.0
      * @return true
      */
     public function authenticate() {
@@ -50,17 +53,16 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
         $accessTokenUrl = $config['accessTokenUrl'];
         $clientId = $config['consumerId'];
         $clientSecret = $config['consumerSecret'];
-        $privateKey = $config['privateKey'];
         $redirectUrl = $config['callbackUrl'];
         $responseType = $config['responseType'];
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
-            || empty($accessTokenUrl) || empty($privateKey)) {
+            || empty($accessTokenUrl)) {
                 
-            require_once 'SAuth/Exception.php';    
-            throw new SAuth_Exception('Mail.ru auth configuration not specifed.');
+            require_once 'SAuth/Exception.php';
+            throw new SAuth_Exception('Foursquare auth configuration not specifed.');
         }
-
+        
         if (isset($_GET['code']) && !empty($_GET['code'])) {
             	
             $authorizationCode = trim($_GET['code']);
@@ -70,28 +72,29 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
                 'client_secret' => $clientSecret,
                 'code' => $authorizationCode,
                 'grant_type' => 'authorization_code',
+
             );
             
             $response = $this->httpRequest('POST', $accessTokenUrl, $accessConfig);
             
             if ($response->isError()) {
-                //mail.ru return 400 http code on error
+                //foursquare return 400 http code on error
                 switch  ($response->getStatus()) {
                     case '400':
                         $parsedErrors = $this->parseResponseJson($response->getBody());
                         $this->_setError($parsedErrors['error']);
                         break;
                     default:
-                        $this->_setError('Mail.ru Oauth service unavailable');
+                        $this->_setError('Foursquare Oauth service unavailable');
                         break;
                 }
-                
+
                 return false;
             } elseif ($response->isSuccessful()) {
                 
                 $parsedResponse = $this->parseResponseJson($response->getBody());
                 $this->_setTokenAccess($parsedResponse['access_token']);
-                $this->setUserParameters($parsedResponse);
+                //try to get user data
                 if ($userParameters = $this->requestUserParams()) {
                     $this->setUserParameters($userParameters);
                 }
@@ -104,6 +107,7 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
                 'redirect_uri' => $redirectUrl,
                 'response_type' => $responseType,
             );
+            
             // TODO: maybe http_build_url ?
             $url = $authorizationUrl . '?';
             $url .= http_build_query($authorizationConfig, null, '&');
@@ -113,22 +117,21 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             $this->_setError($_GET['error']);
             return false;
         }
+        
     }
-    
+
     /**
      * Getting authentication identification
      * @return false|int User ID
      */
     public function getAuthId() {
         
-        $id = (int) $this->getUserParameters('uid');
+        $id = (int) $this->getUserParameters('id');
         return $id > 0 ? $id : false;
     }
     
     /**
-     * Request user params on mail.ru using REST API
-     * http://api.mail.ru/docs/reference/rest/users-getinfo/
-     * FIXME: Working only after auth process, because don't consider expire time
+     * Request user params on foursquare
      * @return array User params
      */
     public function requestUserParams() {
@@ -137,50 +140,23 @@ class SAuth_Provider_Mailru extends SAuth_Provider_Abstract implements SAuth_Pro
             return false;
         }
         
-        $restUrl = $this->getConfig('requestDatarUrl');
+        $apiUrl = $this->getConfig('requestDatarUrl');
         $accessToken = $this->_getTokenAccess();
-        $config = $this->getConfig();
-        
-        if ($accessToken && !empty($restUrl)) {
 
-            $requestParametrs = array(
-                'app_id' => $config['consumerId'],
-                'method' => 'users.getInfo',
-                'secure' => 1,
-                'session_key' => $accessToken,
-            );
-            $sig = $this->getSign($requestParametrs);
-            $requestParametrs['sig'] = $sig;
+        if ($accessToken && !empty($apiUrl)) {
             
-            $response = $this->httpRequest('POST', $restUrl, $requestParametrs);
+            $response = $this->httpRequest('GET', $apiUrl, array('oauth_token' => $accessToken));
             
             if ($response->isError()) {
                 $parsedErrors = (array) $this->parseResponseJson($response->getBody());
-                $this->_setError($parsedErrors['error']['error_msg']);
+                $this->_setError($parsedErrors['meta']['errorDetail']);
                 return false;
             } elseif ($response->isSuccessful()) {
                 $parsedResponse = (array) $this->parseResponseJson($response->getBody());
-                return isset($parsedResponse[0]) ? $parsedResponse[0] : false;
+                return isset($parsedResponse['response']['user']) ? $parsedResponse['response']['user'] : false;
             }
         }
         return false;
     }
     
-    /**
-     * Return mail.ru sign
-     * @param array $requestParams Request parameters
-     * @return string Signature
-     */
-    public function getSign(array $requestParams) {
-        
-        $config = $this->getConfig();
-        $uid = $this->_getTokenAccess();
-        $consumerSecret = $config['consumerSecret'];
-        ksort($requestParams);
-        $params = '';
-        foreach ($requestParams as $key => $value) {
-            $params .= $key . '=' . $value;
-        }
-        return md5($params . $consumerSecret);
-    }    
 }
