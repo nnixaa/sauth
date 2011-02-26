@@ -13,7 +13,48 @@ Includes libraries for next social services:
 * Vkontakte
 * Mail.ru
 
+Getting Started
+---------------
+
+    public function authAction() {
+        
+        $parameters = array(
+            'consumerId' => 'YOUR_CONSUMER_ID',
+            'consumerKey' => 'YOUR_CONSUMER_KEY',
+            'consumerSecret' => 'YOUR_CONSUMER_SECRET',
+            'callbackUrl' => 'http://site.com/call_back_url',
+            'scope' => array(
+                 'user_about_me', 'email',
+            ),
+        );
+        
+        $auth = Zend_Auth::getInstance();
+
+        /**
+         * or SAuth_Adapter_Twitter
+         * or SAuth_Adapter_Foursquare
+         * or SAuth_Adapter_Google
+         * ...
+         */
+        $adapter = new SAuth_Adapter_Facebook($parameters);
+        
+        $result  = $auth->authenticate($adapter);
+        
+        if ($result->isValid()) {
+            
+            echo 'Success!';
+            
+        } else {
+            
+            echo 'Failed!';
+            echo $result->getMessages();
+            
+        }
+        
+    }
+    
 Demo
 ----
 
-[http://dnixa.tmweb.ru](http://dnixa.tmweb.ru)
+[Demo](http://dnixa.com/sauth/demos/public_html/)
+
