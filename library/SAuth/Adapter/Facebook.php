@@ -53,7 +53,8 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
             || empty($accessTokenUrl)) {
                 
-                //TODO: Zend_Auth_Adapter exception
+            require_once 'Zend/Auth/Adapter/Exception.php';
+            throw new Zend_Auth_Adapter_Exception('Facebook auth configuration not specifed');
         }
 
         if (isset($config['scope']) && !empty($config['scope'])) {

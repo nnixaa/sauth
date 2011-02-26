@@ -55,8 +55,8 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
             || empty($accessTokenUrl)) {
                 
-            require_once 'SAuth/Exception.php';
-            throw new SAuth_Exception('Foursquare auth configuration not specifed.');
+            require_once 'Zend/Auth/Adapter/Exception.php';
+            throw new Zend_Auth_Adapter_Exception('Foursquare auth configuration not specifed');
         }
         
         if (isset($_GET['code']) && !empty($_GET['code'])) {

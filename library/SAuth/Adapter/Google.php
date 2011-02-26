@@ -52,8 +52,8 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
         
         if (empty($config['id'])) {
             
-            require_once 'SAuth/Exception.php';
-            throw new SAuth_Exception('Invalid google OpenId url.');
+            require_once 'Zend/Auth/Adapter/Exception.php';
+            throw new Zend_Auth_Adapter_Exception('Invalid google OpenId url');
         }
         $consumer = new Ak33m_OpenId_Consumer();
         $googleExt = new SAuth_Provider_Google_Extension();

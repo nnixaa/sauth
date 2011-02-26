@@ -44,9 +44,10 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
         
         if (empty($apiId) || empty($apiId)) {
             
-            require_once 'SAuth/Exception.php';
-            throw new SAuth_Exception('Vkontakte auth configuration not specifed.');
+            require_once 'Zend/Auth/Adapter/Exception.php';
+            throw new Zend_Auth_Adapter_Exception('Vkontakte auth configuration not specifed');
         }
+
         $appCookie = isset($_COOKIE['vk_app_' . $apiId]) ? $this->parseResponseUrl($_COOKIE['vk_app_' . $apiId]) : null;
         $vkUserCookie = isset($_COOKIE['vk_user_info_' . $apiId]) ? $this->parseResponseUrl($_COOKIE['vk_user_info_' . $apiId]) : null;
         

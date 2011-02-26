@@ -53,8 +53,8 @@ class SAuth_Adapter_Twitter extends SAuth_Adapter_Abstract implements Zend_Auth_
         if (empty($config['consumerKey']) || empty($config['consumerSecret']) || empty($config['userAuthorizationUrl']) 
             || empty($config['accessTokenUrl']) || empty($config['callbackUrl'])) {
                 
-            require_once 'SAuth/Exception.php';
-            throw new SAuth_Exception('Twitter auth configuration not specifed.');
+            require_once 'Zend/Auth/Adapter/Exception.php';
+            throw new Zend_Auth_Adapter_Exception('Twitter auth configuration not specifed');
         }
         
         $consumer = new Zend_Oauth_Consumer($config);
