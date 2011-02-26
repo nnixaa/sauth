@@ -41,7 +41,7 @@ class IndexController extends Zend_Controller_Action {
         $auth = Zend_Auth::getInstance();
         
         if ($auth->hasIdentity()) {
-            $this->_helper->redirector('index', 'index');
+            $this->getResponse()->setRedirect($this->view->siteDir);
         }
         
         $adapterName = $this->getRequest()->getParam('by') ? $this->getRequest()->getParam('by') : 'google';
@@ -67,7 +67,7 @@ class IndexController extends Zend_Controller_Action {
         $auth = Zend_Auth::getInstance();
         $auth->clearIdentity();
 
-        $this->getResponse()->setRedirect('/');
+        $this->getResponse()->setRedirect($this->view->siteDir);
     }
 
 }
