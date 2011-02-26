@@ -16,6 +16,8 @@ Includes libraries for next social services:
 Getting Started
 ---------------
 
+Simple example authenticate function
+
     public function authAction() {
         
         $parameters = array(
@@ -51,6 +53,22 @@ Getting Started
             
         }
         
+    }
+   
+Library also retrieve user data from social service
+
+    public functoin indexAction() {
+        
+        $auth = Zend_Auth::getInstance();
+        
+        if ($auth->hasIdentity()) {
+                
+            /**
+             * User data from service, such as login, email, id, name etc.
+             */
+            $userParameters = $auth->getIdentity();
+        
+        }
     }
     
 Demo
