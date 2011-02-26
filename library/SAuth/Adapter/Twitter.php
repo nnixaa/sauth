@@ -71,7 +71,7 @@ class SAuth_Adapter_Twitter extends SAuth_Adapter_Abstract implements Zend_Auth_
             if ($response->isError()) {
                 //TODO:change on custom
                 $error = 'Twitter Oauth service unavailable';
-                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $error);
+                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
                
             } elseif ($response->isSuccessful()) {
                 $parsedResponse = $this->parseResponseUrl($response->getBody());

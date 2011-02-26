@@ -71,7 +71,7 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
             $consumer->login($config['id'], $config['callbackUrl'], $config['root'], $googleExt);
             if ($error = $consumer->getError()) {
 
-                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $error);
+                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
 
             }
         } elseif (isset($_GET['openid_mode']) && $_GET['openid_mode'] == 'id_res') {
@@ -82,14 +82,11 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
                 $this->setUserParameters($_GET);
                 return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $_GET);
 
-            } else {
-                
-                $error = 'Google openId verification has been faild';
-                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $error);
-
             }
         }
-        return false;
+        
+        $error = 'Google openId verification has been faild';
+        return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
         
     }
 

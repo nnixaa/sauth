@@ -76,7 +76,7 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
             }
         }
         $error = 'Vkontakte auth failed';
-        return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $error);
+        return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
     }
     
     /**

@@ -90,7 +90,7 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
                         break;
                 }
                 
-                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $error);
+                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
                 
             } elseif ($response->isSuccessful()) {
                 
@@ -118,7 +118,7 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
             exit(1);
         } else {
             
-            return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $_GET['error']);
+            return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($_GET['error']));
             
         }
     }
