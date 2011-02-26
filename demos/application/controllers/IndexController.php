@@ -60,6 +60,11 @@ class IndexController extends Zend_Controller_Action {
             $this->view->auth = false;
         }
         
+        //Vkontakte based on own auth system and it causes some problems
+        if ($adapterName == 'vkontakte') {
+            $this->getResponse()->setRedirect($this->config[$adapterName]['callbackUrl']);
+        }
+        
     }
     
     public function logoutAction() {

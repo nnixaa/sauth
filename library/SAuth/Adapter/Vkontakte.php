@@ -61,11 +61,6 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
                 //unset vk info cookie
                 setcookie('vk_user_info_' . $apiId, '', time() - 1000, '/');
                 
-                if (!empty($config['callbackUrl'])) {
-                    header('Location:' . $config['callbackUrl']);
-                    exit(1);
-                }
-                
                 $identity = $this->_prepareIdentity(array_merge($appCookie, $vkUserCookie));
                 
                 return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
