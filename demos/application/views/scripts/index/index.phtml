@@ -33,7 +33,7 @@
                     }
                 });
             } else {
-                window.open('/index/auth/by/' + by, 'Auth', 'height=600,width=600,status=no,toolbar=no,menubar=no,location=no, resizable=no');
+                window.open('<?php echo $this->siteDir;?>/index/auth/by/' + by, 'Auth', 'height=600,width=600,status=no,toolbar=no,menubar=no,location=no, resizable=no');
             }
         }
     </script>
@@ -44,14 +44,14 @@
 <body>
     <?php if (!$this->auth):?>
        <h1>Login via:</h1>
-       <a href="#" onclick="login('google');return false;"><img src="/img/google.png" /></a>
-       <a href="#" onclick="login('twitter');return false;"><img src="/img/twitter.png" /></a>
-       <a href="#" onclick="login('facebook');return false;"><img src="/img/facebook.png" /></a>
-       <a href="#" onclick="login('vkontakte');return false;"><img src="/img/vkontakte.png" /></a>
-       <a href="#" onclick="login('mailru');return false;"><img src="/img/mailru.png" /></a>
-       <a href="#" onclick="login('foursquare');return false;"><img src="/img/foursquare.png" /></a>
+       <a href="#" onclick="login('google');return false;"><img src="<?php echo $this->siteDir;?>/img/google.png" /></a>
+       <a href="#" onclick="login('twitter');return false;"><img src="<?php echo $this->siteDir;?>/img/twitter.png" /></a>
+       <a href="#" onclick="login('facebook');return false;"><img src="<?php echo $this->siteDir;?>/img/facebook.png" /></a>
+       <a href="#" onclick="login('vkontakte');return false;"><img src="<?php echo $this->siteDir;?>/img/vkontakte.png" /></a>
+       <a href="#" onclick="login('mailru');return false;"><img src="<?php echo $this->siteDir;?>/img/mailru.png" /></a>
+       <a href="#" onclick="login('foursquare');return false;"><img src="<?php echo $this->siteDir;?>/img/foursquare.png" /></a>
     <?php else:?>
-       <a href="/index/logout" onclick="">Logout</a>
+       <a href="<?php echo $this->siteDir;?>/index/logout" onclick="">Logout</a>
        <div><strong>Parameters:</strong><pre> <?php print_r($this->parameters);?></pre></div>
     <?php endif;?>
 </body>

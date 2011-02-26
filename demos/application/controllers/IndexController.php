@@ -8,7 +8,9 @@ class IndexController extends Zend_Controller_Action {
     public function init() {
         
         $this->config = Zend_Registry::get('sauthConf');
-        
+        $bootstrap = $this->getInvokeArg('bootstrap');
+        $siteDir = $bootstrap->getOption('siteDir');
+        $this->view->siteDir = $siteDir;
     }
     
     public function indexAction() {
