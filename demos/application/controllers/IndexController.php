@@ -32,7 +32,7 @@ class IndexController extends Zend_Controller_Action {
     }
     
 	/**
-	 * This method will be called twice
+	 * This method will be call twice
 	 * First time when user was opened authentication window
 	 * Second time when social service will redirect user back with success or error
 	 */
@@ -58,9 +58,10 @@ class IndexController extends Zend_Controller_Action {
         } else {
             
             $this->view->auth = false;
+            $this->view->errors = $result->getMessages();
         }
         
-        //Vkontakte based on own auth system and it causes some problems
+        //Vkontakte based on its own auth system and it causes some problems
         if ($adapterName == 'vkontakte') {
             $this->getResponse()->setRedirect($this->config[$adapterName]['callbackUrl']);
         }

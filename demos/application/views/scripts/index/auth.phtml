@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="google-site-verification" content="ulechw5XJLBdsR0-4CvLMjRr3KXOT0jyLZNTEhzE80U" />
-    <title></title>
+    <title>Social Auth</title>
     <script type="text/javascript">
         function reload() {
             window.opener.location = window.opener.location;
@@ -11,11 +11,13 @@
         }
     </script>
 </head>
-<body onload="reload();">
 <?php if ($this->auth):?>
+<body onload="reload();">
 <h2 class="error">Congratulations, you are logged in! Please close this window.</h2>
 <?php else:?>
+<body>
 <h2 class="error">Error has occurred. Please <a onclick="window.close();" href="#">close</a> this window and try again.</h2>
+<div><strong>Error Messages:</strong><pre> <?php print_r($this->errors);?></pre></div>
 <?php endif;?>
 </body>
 </html>
