@@ -125,16 +125,6 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
     }
     
     /**
-     * Getting authentication identification
-     * @return false|int User ID
-     */
-    public function getAuthId() {
-        
-        $id = (int) $this->getUserParameters('id');
-        return $id > 0 ? $id : false;
-    }
-    
-    /**
      * Request user parameters on facebook using Graph API
      * @return array User params
      */

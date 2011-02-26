@@ -119,16 +119,6 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
         }
         
     }
-
-    /**
-     * Getting authentication identification
-     * @return false|int User ID
-     */
-    public function getAuthId() {
-        
-        $id = (int) $this->getUserParameters('id');
-        return $id > 0 ? $id : false;
-    }
     
     /**
      * Request user params on foursquare

@@ -119,16 +119,6 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
     }
     
     /**
-     * Getting authentication identification
-     * @return false|int User ID
-     */
-    public function getAuthId() {
-        
-        $id = (int) $this->getUserParameters('uid');
-        return $id > 0 ? $id : false;
-    }
-    
-    /**
      * Request user params on mail.ru using REST API
      * http://api.mail.ru/docs/reference/rest/users-getinfo/
      * FIXME: Working only after auth process, because don't consider expire time

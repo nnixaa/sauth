@@ -88,15 +88,5 @@ class SAuth_Adapter_Twitter extends SAuth_Adapter_Abstract implements Zend_Auth_
             $consumer->redirect();
         }
     }
-
-    /**
-     * Getting authentication identification
-     * @return false|int User ID
-     */
-    public function getAuthId() {
-        
-        $id = (int) $this->getUserParameters('user_id');
-        return $id > 0 ? $id : false;
-    }
     
 }

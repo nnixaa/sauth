@@ -84,15 +84,5 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
         return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
         
     }
-
-    /**
-     * Getting authentication identification
-     * @return false|int User ID
-     */
-    public function getAuthId() {
-        
-        $id = $this->getUserParameters('openid_identity');
-        return empty($id) ? false : $id;
-    }
     
 }

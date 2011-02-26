@@ -71,14 +71,4 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
         return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
     }
     
-    /**
-     * Getting authentication identification
-     * @return false|int User ID
-     */
-    public function getAuthId() {
-        
-        $id = (int) $this->getUserParameters('id');
-        return $id > 0 ? $id : false;
-    }
-    
 }
