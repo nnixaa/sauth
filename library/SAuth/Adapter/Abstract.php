@@ -29,42 +29,6 @@ abstract class SAuth_Adapter_Abstract {
     }
       
     /**
-     * TODO: Can't select multi-level arrays
-     * Returns user parameters
-     * @param string $key
-     * @return mixed
-     */
-    public function getUserParameters($key = null) {
-        
-        $sessionStorage = $this->getSessionStorage();
-        $userParameters = (array) $sessionStorage->userParameters;
-        
-        if (!empty($userParameters)) {
-            
-            if ($key != null) {
-                $key = (string) $key;
-                return isset($userParameters[$key]) ? $userParameters[$key] : false;
-            }
-        }
-        return $userParameters;
-    }
-    
-    /**
-     * Setting user parameters in session
-     * @param array $userParameters
-     * @return array
-     */
-    public function setUserParameters(array $userParameters) {
-
-        $params = $this->getUserParameters();
-        foreach ($userParameters as $key => $value) {
-            $params[$key] = $value;
-        }
-        $sessionStorage = $this->getSessionStorage();
-        return $sessionStorage->userParameters = $params;
-    }
-    
-    /**
      * Setting up session storage
      * @return Zend_Session_Namespace
      */

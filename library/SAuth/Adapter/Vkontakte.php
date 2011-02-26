@@ -37,10 +37,6 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
      */
     public function authenticate() {
         
-        if ($this->isAuthorized()) {
-            $this->clearAuth();
-        }
-        
         $config = $this->getConfig();
         
         $apiId = $config['consumerId'];
@@ -62,9 +58,6 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
             
             if ($appCookie['sig'] == $sign) {
                 
-                $this->_setTokenAccess($sign);
-                $this->setUserParameters((array) $appCookie);
-                $this->setUserParameters((array) $vkUserCookie);
                 //unset vk info cookie
                 setcookie('vk_user_info_' . $apiId, '', time() - 1000, '/');
                 
@@ -72,7 +65,7 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
                     header('Location:' . $config['callbackUrl']);
                     exit(1);
                 }
-                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $vkUserCookie);
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, array_merge($appCookie, $vkUserCookie));
             }
         }
         $error = 'Vkontakte auth failed';

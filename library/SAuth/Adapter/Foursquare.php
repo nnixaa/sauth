@@ -43,10 +43,6 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
      */
     public function authenticate() {
         
-        if ($this->isAuthorized()) {
-            $this->clearAuth();
-        }
-        
         $config = $this->getConfig();
         
         $authorizationUrl = $config['userAuthorizationUrl'];
@@ -94,13 +90,11 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
             } elseif ($response->isSuccessful()) {
                 
                 $parsedResponse = $this->parseResponseJson($response->getBody());
-                $this->_setTokenAccess($parsedResponse['access_token']);
+
                 //try to get user data
-                if ($userParameters = $this->requestUserParams()) {
-                    $this->setUserParameters($userParameters);
-                }
+                $userParameters = $this->requestUserParams($parsedResponse['access_token']);
                 
-                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $userParameters);
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, array_merge($parsedResponse, $userParameters));
                 
             }
         } elseif (!isset($_GET['error'])) {
@@ -138,14 +132,9 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
      * Request user params on foursquare
      * @return array User params
      */
-    public function requestUserParams() {
-        
-        if (!$this->isAuthorized()) {
-            return false;
-        }
+    public function requestUserParams($accessToken) {
         
         $apiUrl = $this->getConfig('requestDatarUrl');
-        $accessToken = $this->_getTokenAccess();
 
         if ($accessToken && !empty($apiUrl)) {
             

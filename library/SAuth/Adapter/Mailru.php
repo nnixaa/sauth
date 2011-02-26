@@ -44,10 +44,6 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
      */
     public function authenticate() {
         
-        if ($this->isAuthorized()) {
-            $this->clearAuth();
-        }
-        
         $config = $this->getConfig();
         
         $authorizationUrl = $config['userAuthorizationUrl'];
@@ -95,11 +91,8 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
             } elseif ($response->isSuccessful()) {
                 
                 $parsedResponse = $this->parseResponseJson($response->getBody());
-                $this->_setTokenAccess($parsedResponse['access_token']);
-                $this->setUserParameters($parsedResponse);
-                if ($userParameters = $this->requestUserParams()) {
-                    $this->setUserParameters($userParameters);
-                }
+
+                $userParameters = $this->requestUserParams($parsedResponse['access_token']);
                 
                 return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $userParameters);
                 
@@ -139,14 +132,9 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
      * FIXME: Working only after auth process, because don't consider expire time
      * @return array User params
      */
-    public function requestUserParams() {
-        
-        if (!$this->isAuthorized()) {
-            return false;
-        }
+    public function requestUserParams($accessToken) {
         
         $restUrl = $this->getConfig('requestDatarUrl');
-        $accessToken = $this->_getTokenAccess();
         $config = $this->getConfig();
         
         if ($accessToken && !empty($restUrl)) {
@@ -157,7 +145,7 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
                 'secure' => 1,
                 'session_key' => $accessToken,
             );
-            $sig = $this->getSign($requestParametrs);
+            $sig = $this->getSign($requestParametrs, $accessToken);
             $requestParametrs['sig'] = $sig;
             
             $response = $this->httpRequest('POST', $restUrl, $requestParametrs);
@@ -179,12 +167,13 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
      * @param array $requestParams Request parameters
      * @return string Signature
      */
-    public function getSign(array $requestParams) {
+    public function getSign(array $requestParams, $accessToken) {
         
         $config = $this->getConfig();
-        $uid = $this->_getTokenAccess();
+
         $consumerSecret = $config['consumerSecret'];
         ksort($requestParams);
+
         $params = '';
         foreach ($requestParams as $key => $value) {
             $params .= $key . '=' . $value;

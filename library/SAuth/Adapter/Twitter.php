@@ -48,10 +48,6 @@ class SAuth_Adapter_Twitter extends SAuth_Adapter_Abstract implements Zend_Auth_
      */
     public function authenticate() {
         
-        if ($this->isAuthorized()) {
-            $this->clearAuth();
-        }
-        
         $config = $this->getConfig();
         
         if (empty($config['consumerKey']) || empty($config['consumerSecret']) || empty($config['userAuthorizationUrl']) 
@@ -65,6 +61,7 @@ class SAuth_Adapter_Twitter extends SAuth_Adapter_Abstract implements Zend_Auth_
         $tokenRequest = $this->_getTokenRequest();
         
         if (!empty($tokenRequest) && !empty ($_GET)) {
+            
             $tokenAccess = $consumer->getAccessToken($_GET, $tokenRequest);
             $response = $tokenAccess->getResponse();
             
@@ -74,14 +71,16 @@ class SAuth_Adapter_Twitter extends SAuth_Adapter_Abstract implements Zend_Auth_
                 return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
                
             } elseif ($response->isSuccessful()) {
+
                 $parsedResponse = $this->parseResponseUrl($response->getBody());
-                $this->_setTokenAccess($parsedResponse['oauth_token']);
-                $this->setUserParameters($parsedResponse);
+
                 $this->_unsetTokenRequest();
+                
                 return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $parsedResponse);
             }
             
         } else {
+            
             $tokenRequest = $consumer->getRequestToken();
             $this->_setTokenRequest($tokenRequest);
             $consumer->redirect();

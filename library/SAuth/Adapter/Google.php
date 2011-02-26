@@ -48,10 +48,6 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
      */
     public function authenticate() {
         
-        if ($this->isAuthorized()) {
-            $this->clearAuth();
-        }
-        
         $config = $this->getConfig();
         
         if (empty($config['id'])) {
@@ -78,10 +74,7 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
                 
             if ($consumer->verify($_GET, $id, $googleExt)) {
 
-                $this->_setTokenAccess($_GET['openid_identity']);
-                $this->setUserParameters($_GET);
                 return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $_GET);
-
             }
         }
         

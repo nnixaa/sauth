@@ -42,10 +42,6 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
      */
     public function authenticate() {
         
-        if ($this->isAuthorized()) {
-            $this->clearAuth();
-        }
-        
         $config = $this->getConfig();
         
         $authorizationUrl = $config['userAuthorizationUrl'];
@@ -96,12 +92,11 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
             } elseif ($response->isSuccessful()) {
                 
                 $parsedResponse = $this->parseResponseUrl($response->getBody());
+
                 //try to get user data
-                if ($userParameters = $this->requestUserParams()) {
-                    $this->setUserParameters($userParameters);
-                }
+                $userParameters = (array) $this->requestUserParams($parsedResponse['access_token']);
                 
-                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $userParameters);
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, array_merge($parsedResponse, $userParameters));
                 
             }
         } elseif (!isset($_GET['error'])) {
@@ -141,14 +136,9 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
      * Request user parameters on facebook using Graph API
      * @return array User params
      */
-    public function requestUserParams() {
-        
-        if (!$this->isAuthorized()) {
-            return false;
-        }
+    public function requestUserParams($accessToken) {
         
         $graphUrl = $this->getConfig('requestDatarUrl');
-        $accessToken = $this->_getTokenAccess();
 
         if ($accessToken && !empty($graphUrl)) {
             
