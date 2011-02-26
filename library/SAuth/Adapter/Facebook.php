@@ -100,6 +100,7 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
                 if ($userParameters = $this->requestUserParams()) {
                     $this->setUserParameters($userParameters);
                 }
+                
                 return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $userParameters);
                 
             }

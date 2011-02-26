@@ -1,3 +1,4 @@
 .project
 .settings/*
 demos/application/Bootstrap.php
+library/Zend

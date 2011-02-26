@@ -83,14 +83,15 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
                 switch  ($response->getStatus()) {
                     case '400':
                         $parsedErrors = $this->parseResponseJson($response->getBody());
-                        $this->_setError($parsedErrors['error']);
+                        $error = $parsedErrors['error'];
                         break;
                     default:
-                        $this->_setError('Mail.ru Oauth service unavailable');
+                        $error = 'Mail.ru Oauth service unavailable';
                         break;
                 }
                 
-                return false;
+                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $error);
+                
             } elseif ($response->isSuccessful()) {
                 
                 $parsedResponse = $this->parseResponseJson($response->getBody());
@@ -99,7 +100,9 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
                 if ($userParameters = $this->requestUserParams()) {
                     $this->setUserParameters($userParameters);
                 }
-                return $this->isAuthorized();
+                
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $userParameters);
+                
             }
         } elseif (!isset($_GET['error'])) {
             
@@ -114,8 +117,9 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
             header('Location: ' . $url);
             exit(1);
         } else {
-            $this->_setError($_GET['error']);
-            return false;
+            
+            return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $_GET['error']);
+            
         }
     }
     

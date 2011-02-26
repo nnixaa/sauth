@@ -65,20 +65,28 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
         if (is_array($config['exchangeExtension']) && !empty($config['exchangeExtension'])) {
             $googleExt->setParams($config['exchangeExtension']);
         }
+
         if (!isset($_GET['openid_mode']) || empty($_GET['openid_mode'])) {
+
             $consumer->login($config['id'], $config['callbackUrl'], $config['root'], $googleExt);
             if ($error = $consumer->getError()) {
-                throw new SAuth_Exception($error);
+
+                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $error);
+
             }
         } elseif (isset($_GET['openid_mode']) && $_GET['openid_mode'] == 'id_res') {
                 
             if ($consumer->verify($_GET, $id, $googleExt)) {
+
                 $this->_setTokenAccess($_GET['openid_identity']);
                 $this->setUserParameters($_GET);
-                return $this->isAuthorized();
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $_GET);
+
             } else {
-                $this->_setError('Google openId verification has been faild');
-                return false;
+                
+                $error = 'Google openId verification has been faild';
+                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $error);
+
             }
         }
         return false;

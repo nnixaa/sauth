@@ -72,10 +72,11 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
                     header('Location:' . $config['callbackUrl']);
                     exit(1);
                 }
-                return $this->isAuthorized();
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $vkUserCookie);
             }
         }
-        return false;
+        $error = 'Vkontakte auth failed';
+        return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, $error);
     }
     
     /**
