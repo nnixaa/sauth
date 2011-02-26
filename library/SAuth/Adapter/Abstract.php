@@ -19,11 +19,6 @@ abstract class SAuth_Adapter_Abstract {
     protected $_sessionLiveTime = 86400;
     
     /**
-     * @var array Errors
-     */
-    protected $_errors = array(); 
-    
-    /**
      * Object constructor method
      * @param array $config
      */
@@ -32,17 +27,7 @@ abstract class SAuth_Adapter_Abstract {
         $this->setConfig($config);
         $this->setUpSessionStorage();
     }
-    
-    /**
-     * Returns authorization flag
-     * @return bool
-     */
-    public function isAuthorized() {
-        
-        $tokenAccess = $this->_getTokenAccess();
-        return empty($tokenAccess) ? false : true;
-    }
-    
+      
     /**
      * TODO: Can't select multi-level arrays
      * Returns user parameters
@@ -77,13 +62,6 @@ abstract class SAuth_Adapter_Abstract {
         }
         $sessionStorage = $this->getSessionStorage();
         return $sessionStorage->userParameters = $params;
-    }
-    
-    /**
-     * Clear saved access token
-     */
-    public function clearAuth() {
-        $this->getSessionStorage()->unsetAll();
     }
     
     /**
@@ -223,14 +201,7 @@ abstract class SAuth_Adapter_Abstract {
         }
         
         return $client->request($type);
-    }
-    
-    /**
-     * Getting errors array
-     */
-    public function getErrors() {
-        return $this->_errors;
-    }    
+    }  
     
     /** 
      * Setting session key
@@ -317,15 +288,5 @@ abstract class SAuth_Adapter_Abstract {
         
         $sessionStorage->tokenRequest = null;
         unset($sessionStorage->tokenRequest);
-    }
-    
-    /**
-     * Setting error string
-     * @param string Error message
-     * @return string
-     */
-    protected function _setError($error) {
-            
-        return $this->_errors[] = trim($error);
     }
 }
