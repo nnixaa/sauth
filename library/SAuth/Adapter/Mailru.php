@@ -94,7 +94,9 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
 
                 $userParameters = $this->requestUserParams($parsedResponse['access_token']);
                 
-                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $userParameters);
+                $identity = $this->_prepareIdentity(array_merge($parsedResponse, $userParameters));
+                
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
                 
             }
         } elseif (!isset($_GET['error'])) {

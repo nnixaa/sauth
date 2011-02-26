@@ -193,37 +193,7 @@ abstract class SAuth_Adapter_Abstract {
         }
         return false;
     }	
-	
-    /**
-     * Getting token access from session storage
-     * @return false|string
-     */
-    protected function _getTokenAccess() {
-        
-        $sessionStorage = $this->getSessionStorage();
-        return !empty($sessionStorage->tokenAccess) ? unserialize($sessionStorage->tokenAccess) : false;
-    }
 
-    /**
-     * Seting token access from session storage
-     * @param string $tokenAccess
-     * @return string
-     */
-    protected function _setTokenAccess($tokenAccess) {
-        
-        $sessionStorage = $this->getSessionStorage();
-        return $sessionStorage->tokenAccess = serialize($tokenAccess);
-    }
-
-    /**
-     * Unset token access from session storage
-     */
-    protected function _unsetTokenAccess() {
-            
-        $sessionStorage->tokenAccess = null;
-        unset($sessionStorage->tokenAccess);
-    }
-    
     /**
      * Getting token request from session storage
      * @return false|string
@@ -252,5 +222,14 @@ abstract class SAuth_Adapter_Abstract {
         
         $sessionStorage->tokenRequest = null;
         unset($sessionStorage->tokenRequest);
+    }
+    
+    /**
+     * Add specified parameters into identity
+     */
+    protected function _prepareIdentity($identity) {
+        
+        $identity['adapterName'] = $this->_sessionKey;
+        return $identity;
     }
 }

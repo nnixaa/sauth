@@ -73,8 +73,10 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
         } elseif (isset($_GET['openid_mode']) && $_GET['openid_mode'] == 'id_res') {
                 
             if ($consumer->verify($_GET, $id, $googleExt)) {
-
-                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $_GET);
+                
+                $identity = $this->_prepareIdentity($_GET);
+                
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
             }
         }
         

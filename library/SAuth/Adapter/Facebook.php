@@ -95,8 +95,9 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
 
                 //try to get user data
                 $userParameters = (array) $this->requestUserParams($parsedResponse['access_token']);
+                $identity = $this->_prepareIdentity(array_merge($parsedResponse, $userParameters));
                 
-                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, array_merge($parsedResponse, $userParameters));
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
                 
             }
         } elseif (!isset($_GET['error'])) {

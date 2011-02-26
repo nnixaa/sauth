@@ -94,7 +94,9 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
                 //try to get user data
                 $userParameters = $this->requestUserParams($parsedResponse['access_token']);
                 
-                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, array_merge($parsedResponse, $userParameters));
+                $identity = $this->_prepareIdentity(array_merge($parsedResponse, $userParameters));
+                
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
                 
             }
         } elseif (!isset($_GET['error'])) {

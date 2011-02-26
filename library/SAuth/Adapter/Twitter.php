@@ -76,7 +76,9 @@ class SAuth_Adapter_Twitter extends SAuth_Adapter_Abstract implements Zend_Auth_
 
                 $this->_unsetTokenRequest();
                 
-                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $parsedResponse);
+                $identity = $this->_prepareIdentity($parsedResponse);
+                
+                return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
             }
             
         } else {
