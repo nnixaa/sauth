@@ -3,6 +3,9 @@
 /**  Zend_Session_Namespace */
 require_once 'Zend/Session/Namespace.php';
 
+/**  Zend_Http_Client */
+require_once 'Zend/Http/Client.php';
+
 /**
  * Abstract class for Sauth libraries
  */
@@ -37,7 +40,7 @@ abstract class SAuth_Adapter_Abstract {
         $sessionKey = (string) $this->getSessionKey();
         if (empty($sessionKey)) {
             require_once 'Zend/Auth/Adapter/Exception.php';
-            throw new Zend_Auth_Adapter_Exception('Invalid auth storage key.');
+            throw new Zend_Auth_Adapter_Exception('Invalid auth storage key');
         }
         $this->_sessionStorage = new Zend_Session_Namespace($sessionKey);
         $this->_sessionStorage->setExpirationSeconds($this->getSessionLiveTime());
@@ -133,13 +136,17 @@ abstract class SAuth_Adapter_Abstract {
     }
     
     /**
-     * Parse response json
+     * Parse json response
      * @param string $body
      * @return array|false
      */
     public function parseResponseJson($body) {
             
         $body = (string) trim($body);
+        
+        /**  Zend_Json */
+        require_once 'Zend/Json.php';
+        
         return Zend_Json::decode($body);
     }    
     
