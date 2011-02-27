@@ -22,7 +22,6 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
      */
     protected $_config = array(
         'consumerId' => '',
-        'consumerKey' => '',
         'consumerSecret' => '',
         'callbackUrl' => '',
         'userAuthorizationUrl' => 'http://www.facebook.com/dialog/oauth',
