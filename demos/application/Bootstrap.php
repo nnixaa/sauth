@@ -56,7 +56,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             'consumerId' => '',
             'privateKey' => '',
             'consumerSecret' => '',
-            'callbackUrl' => $siteUrl . $siteDir . 'index/auth/by/mailru',
+            'callbackUrl' => $siteUrl . $siteDir . '/index/auth/by/mailru',
         );
         
         $sauthConf['foursquare'] = array(
