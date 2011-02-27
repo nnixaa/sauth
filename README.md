@@ -12,6 +12,7 @@ Includes libraries for next social services:
 * Foursquare
 * Vkontakte
 * Mail.ru
+* Flickr
 
 Getting Started
 ---------------
