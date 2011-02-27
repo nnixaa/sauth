@@ -21,9 +21,9 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
      * @var array Configuration array
      */
     protected $_config = array(
-        'consumerId' => '',
-        'consumerSecret' => '',
-        'callbackUrl' => '',
+        'consumerId'        => '',
+        'consumerSecret'    => '',
+        'callbackUrl'       => '',
     );
     
     /**
@@ -39,10 +39,10 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
         
         $config = $this->getConfig();
         
-        $apiId = $config['consumerId'];
-        $apiSecret = $config['consumerSecret'];
+        $apiId      = $config['consumerId'];
+        $apiSecret  = $config['consumerSecret'];
         
-        if (empty($apiId) || empty($apiId)) {
+        if (empty($apiId) || empty($apiSecret)) {
             
             require_once 'Zend/Auth/Adapter/Exception.php';
             throw new Zend_Auth_Adapter_Exception('Vkontakte auth configuration not specifed');
@@ -67,6 +67,7 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
                 return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
             }
         }
+
         $error = 'Vkontakte auth failed';
         return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
     }

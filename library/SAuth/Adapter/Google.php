@@ -31,9 +31,9 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
      * @var array Configuration array
      */
     protected $_config = array(
-        'id' => 'https://www.google.com/accounts/o8/id',
-        'callbackUrl' => '',
-        'root' => '',
+        'id'                => 'https://www.google.com/accounts/o8/id',
+        'callbackUrl'       => '',
+        'root'              => '',
         'exchangeExtension' => array(),
     );
     
@@ -55,10 +55,12 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
             require_once 'Zend/Auth/Adapter/Exception.php';
             throw new Zend_Auth_Adapter_Exception('Invalid google OpenId url');
         }
+        
         $consumer = new Ak33m_OpenId_Consumer();
         $googleExt = new SAuth_Provider_Google_Extension();
         
         if (is_array($config['exchangeExtension']) && !empty($config['exchangeExtension'])) {
+            
             $googleExt->setParams($config['exchangeExtension']);
         }
 

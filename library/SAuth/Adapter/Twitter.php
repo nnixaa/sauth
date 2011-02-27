@@ -27,14 +27,14 @@ class SAuth_Adapter_Twitter extends SAuth_Adapter_Abstract implements Zend_Auth_
      * @var array Configuration array
      */
     protected $_config = array(
-        'requestScheme' => Zend_Oauth::REQUEST_SCHEME_HEADER,
-        'consumerKey' => '',
-        'consumerSecret' => '',
-        'version' => '1.0',
-        'callbackUrl' => '',
-        'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
-        'userAuthorizationUrl' => 'https://api.twitter.com/oauth/authorize',
-        'accessTokenUrl' => 'https://api.twitter.com/oauth/access_token',
+        'requestScheme'         => Zend_Oauth::REQUEST_SCHEME_HEADER,
+        'consumerKey'           => '',
+        'consumerSecret'        => '',
+        'version'               => '1.0',
+        'callbackUrl'           => '',
+        'requestTokenUrl'       => 'https://api.twitter.com/oauth/request_token',
+        'userAuthorizationUrl'  => 'https://api.twitter.com/oauth/authorize',
+        'accessTokenUrl'        => 'https://api.twitter.com/oauth/access_token',
     );
     
     /**
