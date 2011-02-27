@@ -40,6 +40,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             'consumerId' => '',
             'consumerSecret' => '',
             'callbackUrl' => $siteUrl . $siteDir . '/index/auth/by/facebook',
+            'display' => SAuth_Adapter_Facebook::DISPLAY_POPUP,
             'scope' => array(
                  'user_about_me', 'email',
             ),

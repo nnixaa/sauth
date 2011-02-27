@@ -18,16 +18,33 @@ require_once 'Zend/Auth/Adapter/Interface.php';
 class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth_Adapter_Interface {
     
     /**
+     * Display modes
+     * http://developers.facebook.com/docs/reference/dialogs/#display
+     */
+    const DISPLAY_PAGE      = 'page';
+    const DISPLAY_POPUP     = 'popup';
+    const DISPLAY_IFRAME    = 'iframe';
+    
+    /**
+     * Response types
+     */
+    const RESPONSE_TYPE_CODE        = 'code';
+    const RESPONSE_TYPE_TOKEN       = 'token';
+    const RESPONSE_TYPE_CODE_TOKEN  = 'code_and_token';
+    
+    /**
      * @var array Configuration array
      */
     protected $_config = array(
-        'consumerId' => '',
-        'consumerSecret' => '',
-        'callbackUrl' => '',
-        'userAuthorizationUrl' => 'http://www.facebook.com/dialog/oauth',
-        'accessTokenUrl' => 'https://graph.facebook.com/oauth/access_token',
-        'requestDatarUrl' => 'https://graph.facebook.com/me',
-        'scope' => array(),
+        'consumerId'            => '',
+        'consumerSecret'        => '',
+        'callbackUrl'           => '',
+        'userAuthorizationUrl'  => 'http://www.facebook.com/dialog/oauth',
+        'accessTokenUrl'        => 'https://graph.facebook.com/oauth/access_token',
+        'requestDatarUrl'       => 'https://graph.facebook.com/me',
+        'response_type'         => self::RESPONSE_TYPE_CODE,
+        'display'               => self::DISPLAY_PAGE,
+        'scope'                 => array(),
     );
     
     /**
@@ -43,11 +60,11 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
         
         $config = $this->getConfig();
         
-        $authorizationUrl = $config['userAuthorizationUrl'];
-        $accessTokenUrl = $config['accessTokenUrl'];
-        $clientId = $config['consumerId'];
-        $clientSecret = $config['consumerSecret'];
-        $redirectUrl = $config['callbackUrl'];
+        $authorizationUrl   = $config['userAuthorizationUrl'];
+        $accessTokenUrl     = $config['accessTokenUrl'];
+        $clientId           = $config['consumerId'];
+        $clientSecret       = $config['consumerSecret'];
+        $redirectUrl        = $config['callbackUrl'];
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
             || empty($accessTokenUrl)) {
@@ -103,8 +120,9 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
         } elseif (!isset($_GET['error'])) {
             
             $authorizationConfig = array(
-                'client_id' => $clientId, 
-                'redirect_uri' => $redirectUrl,
+                'client_id'     => $clientId, 
+                'redirect_uri'  => $redirectUrl,
+                'display'       => $config['display'],
             );
             
             if (isset($scope)) {
