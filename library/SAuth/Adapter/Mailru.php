@@ -20,17 +20,24 @@ require_once 'Zend/Auth/Adapter/Interface.php';
 class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_Adapter_Interface {
     
     /**
+     * Response types
+     */
+    const RESPONSE_TYPE_CODE        = 'code';
+    const RESPONSE_TYPE_TOKEN       = 'token';
+    const RESPONSE_TYPE_CODE_TOKEN  = 'code_and_token';
+    
+    /**
      * @var array Configuration array
      */
     protected $_config = array(
-        'consumerId' => '',
-        'privateKey' => '',
-        'consumerSecret' => '',
-        'callbackUrl' => '',
-        'userAuthorizationUrl' => 'https://connect.mail.ru/oauth/authorize',
-        'accessTokenUrl' => 'https://connect.mail.ru/oauth/token',
-        'requestDatarUrl' => 'http://www.appsmail.ru/platform/api',
-        'responseType' => 'code',
+        'consumerId'            => '',
+        'privateKey'            => '',
+        'consumerSecret'        => '',
+        'callbackUrl'           => '',
+        'userAuthorizationUrl'  => 'https://connect.mail.ru/oauth/authorize',
+        'accessTokenUrl'        => 'https://connect.mail.ru/oauth/token',
+        'requestDatarUrl'       => 'http://www.appsmail.ru/platform/api',
+        'responseType'          => self::RESPONSE_TYPE_CODE,
     );
     
     /**
@@ -46,13 +53,13 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
         
         $config = $this->getConfig();
         
-        $authorizationUrl = $config['userAuthorizationUrl'];
-        $accessTokenUrl = $config['accessTokenUrl'];
-        $clientId = $config['consumerId'];
-        $clientSecret = $config['consumerSecret'];
-        $privateKey = $config['privateKey'];
-        $redirectUrl = $config['callbackUrl'];
-        $responseType = $config['responseType'];
+        $authorizationUrl   = $config['userAuthorizationUrl'];
+        $accessTokenUrl     = $config['accessTokenUrl'];
+        $clientId           = $config['consumerId'];
+        $clientSecret       = $config['consumerSecret'];
+        $privateKey         = $config['privateKey'];
+        $redirectUrl        = $config['callbackUrl'];
+        $responseType       = $config['responseType'];
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
             || empty($accessTokenUrl) || empty($privateKey)) {
@@ -63,13 +70,12 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
 
         if (isset($_GET['code']) && !empty($_GET['code'])) {
             	
-            $authorizationCode = trim($_GET['code']);
             $accessConfig = array(
-                'client_id' => $clientId,
-                'redirect_uri' => $redirectUrl,
+                'client_id'     => $clientId,
+                'redirect_uri'  => $redirectUrl,
                 'client_secret' => $clientSecret,
-                'code' => $authorizationCode,
-                'grant_type' => 'authorization_code',
+                'code'          => trim($_GET['code']),
+                'grant_type'    => 'authorization_code',
             );
             
             $response = $this->httpRequest('POST', $accessTokenUrl, $accessConfig);
@@ -102,15 +108,16 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
         } elseif (!isset($_GET['error'])) {
             
             $authorizationConfig = array(
-                'client_id' => $clientId, 
-                'redirect_uri' => $redirectUrl,
+                'client_id'     => $clientId, 
+                'redirect_uri'  => $redirectUrl,
                 'response_type' => $responseType,
             );
-            // TODO: maybe http_build_url ?
+
             $url = $authorizationUrl . '?';
             $url .= http_build_query($authorizationConfig, null, '&');
             header('Location: ' . $url);
             exit(1);
+            
         } else {
             
             return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($_GET['error']));
