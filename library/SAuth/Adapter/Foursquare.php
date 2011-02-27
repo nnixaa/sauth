@@ -16,19 +16,27 @@ require_once 'Zend/Auth/Adapter/Interface.php';
  * http://developer.foursquare.com/docs/oauth.html
  */
 class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Auth_Adapter_Interface {
+
+    
+    /**
+     * Response types
+     */
+    const RESPONSE_TYPE_CODE        = 'code';
+    const RESPONSE_TYPE_TOKEN       = 'token';
+    const RESPONSE_TYPE_CODE_TOKEN  = 'code_and_token';
     
     /**
      * @var array Configuration array
      */
     protected $_config = array(
-        'consumerId' => '',
-        'consumerKey' => '',
-        'consumerSecret' => '',
-        'callbackUrl' => '',
-        'userAuthorizationUrl' => 'https://foursquare.com/oauth2/authorize',
-        'accessTokenUrl' => 'https://foursquare.com/oauth2/access_token',
-        'requestDatarUrl' => 'https://api.foursquare.com/v2/users/self',
-        'responseType' => 'code',
+        'consumerId'            => '',
+        'consumerKey'           => '',
+        'consumerSecret'        => '',
+        'callbackUrl'           => '',
+        'userAuthorizationUrl'  => 'https://foursquare.com/oauth2/authorize',
+        'accessTokenUrl'        => 'https://foursquare.com/oauth2/access_token',
+        'requestDatarUrl'       => 'https://api.foursquare.com/v2/users/self',
+        'responseType'          => self::RESPONSE_TYPE_CODE,
         
     );
     
@@ -45,12 +53,12 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
         
         $config = $this->getConfig();
         
-        $authorizationUrl = $config['userAuthorizationUrl'];
-        $accessTokenUrl = $config['accessTokenUrl'];
-        $clientId = $config['consumerId'];
-        $clientSecret = $config['consumerSecret'];
-        $redirectUrl = $config['callbackUrl'];
-        $responseType = $config['responseType'];
+        $authorizationUrl   = $config['userAuthorizationUrl'];
+        $accessTokenUrl     = $config['accessTokenUrl'];
+        $clientId           = $config['consumerId'];
+        $clientSecret       = $config['consumerSecret'];
+        $redirectUrl        = $config['callbackUrl'];
+        $responseType       = $config['responseType'];
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
             || empty($accessTokenUrl)) {
@@ -61,13 +69,12 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
         
         if (isset($_GET['code']) && !empty($_GET['code'])) {
             	
-            $authorizationCode = trim($_GET['code']);
             $accessConfig = array(
-                'client_id' => $clientId,
-                'redirect_uri' => $redirectUrl,
+                'client_id'     => $clientId,
+                'redirect_uri'  => $redirectUrl,
                 'client_secret' => $clientSecret,
-                'code' => $authorizationCode,
-                'grant_type' => 'authorization_code',
+                'code'          => trim($_GET['code']),
+                'grant_type'    => 'authorization_code',
 
             );
             
@@ -102,16 +109,16 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
         } elseif (!isset($_GET['error'])) {
             
             $authorizationConfig = array(
-                'client_id' => $clientId, 
-                'redirect_uri' => $redirectUrl,
+                'client_id'     => $clientId, 
+                'redirect_uri'  => $redirectUrl,
                 'response_type' => $responseType,
             );
             
-            // TODO: maybe http_build_url ?
             $url = $authorizationUrl . '?';
             $url .= http_build_query($authorizationConfig, null, '&');
             header('Location: ' . $url);
             exit(1);
+            
         } else {
             
             return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($_GET['error']));
