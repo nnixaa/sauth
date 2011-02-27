@@ -65,6 +65,7 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
         $clientId           = $config['consumerId'];
         $clientSecret       = $config['consumerSecret'];
         $redirectUrl        = $config['callbackUrl'];
+        $responseType       = $config['responseType'];
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
             || empty($accessTokenUrl)) {
@@ -79,12 +80,11 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
         
         if (isset($_GET['code']) && !empty($_GET['code'])) {
             	
-            $authorizationCode = trim($_GET['code']);
             $accessConfig = array(
-                'client_id' => $clientId,
-                'redirect_uri' => $redirectUrl,
+                'client_id'     => $clientId,
+                'redirect_uri'  => $redirectUrl,
                 'client_secret' => $clientSecret,
-                'code' => $authorizationCode,
+                'code'          => trim($_GET['code']),
             );
             if (isset($scope)) {
                 $accessConfig['scope'] = implode($scope, ',');
@@ -123,6 +123,7 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
                 'client_id'     => $clientId, 
                 'redirect_uri'  => $redirectUrl,
                 'display'       => $config['display'],
+                'response_type' => $responseType,
             );
             
             if (isset($scope)) {
