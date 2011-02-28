@@ -30,7 +30,6 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
      */
     protected $_config = array(
         'consumerId'            => '',
-        'consumerKey'           => '',
         'consumerSecret'        => '',
         'callbackUrl'           => '',
         'userAuthorizationUrl'  => 'https://foursquare.com/oauth2/authorize',
@@ -113,7 +112,7 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
                 'redirect_uri'  => $redirectUrl,
                 'response_type' => $responseType,
             );
-            
+
             $url = $authorizationUrl . '?';
             $url .= http_build_query($authorizationConfig, null, '&');
             header('Location: ' . $url);
