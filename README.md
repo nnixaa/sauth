@@ -17,7 +17,7 @@ Includes libraries for next social services:
 Getting Started
 ---------------
 
-Simple example authenticate function
+Simple example of authentication
 
     public function authAction() {
         
