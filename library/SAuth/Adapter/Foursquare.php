@@ -26,6 +26,11 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
     const RESPONSE_TYPE_CODE_TOKEN  = 'code_and_token';
     
     /**
+     * Grant type
+     */
+    const GRANT_TYPE = 'authorization_code';
+        
+    /**
      * @var array Configuration array
      */
     protected $_config = array(
@@ -36,7 +41,7 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
         'accessTokenUrl'        => 'https://foursquare.com/oauth2/access_token',
         'requestDatarUrl'       => 'https://api.foursquare.com/v2/users/self',
         'responseType'          => self::RESPONSE_TYPE_CODE,
-        
+        'grantType'             => self::GRANT_TYPE,
     );
     
     /**
@@ -58,6 +63,7 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
         $clientSecret       = $config['consumerSecret'];
         $redirectUrl        = $config['callbackUrl'];
         $responseType       = $config['responseType'];
+        $grantType          = $config['grantType'];
         
         if (empty($authorizationUrl) || empty($clientId) || empty($clientSecret) || empty($redirectUrl) 
             || empty($accessTokenUrl)) {
@@ -73,7 +79,7 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
                 'redirect_uri'  => $redirectUrl,
                 'client_secret' => $clientSecret,
                 'code'          => trim($_GET['code']),
-                'grant_type'    => 'authorization_code',
+                'grant_type'    => $grantType,
 
             );
             
