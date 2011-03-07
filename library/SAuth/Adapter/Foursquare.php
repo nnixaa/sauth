@@ -145,8 +145,8 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
             $response = $this->httpRequest('GET', $apiUrl, array('oauth_token' => $accessToken));
             
             if ($response->isError()) {
-                $parsedErrors = (array) $this->parseResponseJson($response->getBody());
-                $this->_setError($parsedErrors['meta']['errorDetail']);
+                // TODO: maybe will better return an error?
+                // $parsedErrors = (array) $this->parseResponseJson($response->getBody());
                 return false;
             } elseif ($response->isSuccessful()) {
                 $parsedResponse = (array) $this->parseResponseJson($response->getBody());

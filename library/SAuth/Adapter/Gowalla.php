@@ -92,8 +92,11 @@ class SAuth_Adapter_Gowalla extends SAuth_Adapter_Abstract implements Zend_Auth_
             } elseif ($response->isSuccessful()) {
                 
                 $parsedResponse = $this->parseResponseJson($response->getBody());
+                Zend_Debug::dump($parsedResponse);
+                //try to get user data
+                $userParameters = (array) $this->requestUserParams($parsedResponse['access_token']);
                 
-                $identity = $this->_prepareIdentity($parsedResponse);
+                $identity = $this->_prepareIdentity(array_merge($parsedResponse, $userParameters));
                 
                 return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
                 
@@ -116,6 +119,31 @@ class SAuth_Adapter_Gowalla extends SAuth_Adapter_Abstract implements Zend_Auth_
             
         }
         
+    }
+    
+    /**
+     * Request user params on foursquare
+     * @return array User params
+     */
+    public function requestUserParams($accessToken) {
+        
+        $apiUrl = $this->getConfig('requestDatarUrl');
+
+        if ($accessToken && !empty($apiUrl)) {
+            
+            $response = $this->httpRequest('POST', $apiUrl, array('oauth_token' => $accessToken), array('Accept' => 'application/json'));
+            Zend_Debug::dump($response);
+            die();
+            if ($response->isError()) {
+                // TODO: maybe will better return an error?
+                // $parsedErrors = (array) $this->parseResponseJson($response->getBody());
+                return false;
+            } elseif ($response->isSuccessful()) {
+                $parsedResponse = (array) $this->parseResponseJson($response->getBody());
+                return isset($parsedResponse['response']['user']) ? $parsedResponse['response']['user'] : false;
+            }
+        }
+        return false;
     }
     
 }

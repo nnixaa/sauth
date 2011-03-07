@@ -155,8 +155,8 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
             $response = $this->httpRequest('GET', $graphUrl, array('access_token' => $accessToken));
             
             if ($response->isError()) {
-                $parsedErrors = (array) $this->parseResponseJson($response->getBody());
-                $this->_setError($parsedErrors['error']['message']);
+                // TODO: maybe will better return an error?
+                // $parsedErrors = (array) $this->parseResponseJson($response->getBody());
                 return false;
             } elseif ($response->isSuccessful()) {
                 return $this->parseResponseJson($response->getBody());

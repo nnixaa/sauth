@@ -150,8 +150,8 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
             $response = $this->httpRequest('POST', $restUrl, $requestParametrs);
             
             if ($response->isError()) {
-                $parsedErrors = (array) $this->parseResponseJson($response->getBody());
-                $this->_setError($parsedErrors['error']['error_msg']);
+                // TODO: maybe will better return an error?
+                // $parsedErrors = (array) $this->parseResponseJson($response->getBody());
                 return false;
             } elseif ($response->isSuccessful()) {
                 $parsedResponse = (array) $this->parseResponseJson($response->getBody());
