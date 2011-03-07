@@ -44,13 +44,14 @@
 <body>
     <?php if (!$this->auth):?>
        <h1>Login via:</h1>
-       <a href="#" onclick="login('google');return false;"><img src="<?php echo $this->siteDir;?>/img/google.png" /></a>
-       <a href="#" onclick="login('twitter');return false;"><img src="<?php echo $this->siteDir;?>/img/twitter.png" /></a>
-       <a href="#" onclick="login('facebook');return false;"><img src="<?php echo $this->siteDir;?>/img/facebook.png" /></a>
-       <a href="#" onclick="login('vkontakte');return false;"><img src="<?php echo $this->siteDir;?>/img/vkontakte.png" /></a>
-       <a href="#" onclick="login('mailru');return false;"><img src="<?php echo $this->siteDir;?>/img/mailru.png" /></a>
-       <a href="#" onclick="login('foursquare');return false;"><img src="<?php echo $this->siteDir;?>/img/foursquare.png" /></a>
-       <a href="#" onclick="login('flickr');return false;"><img src="<?php echo $this->siteDir;?>/img/flickr.png" /></a>
+       <a href="#" onclick="login('google');return false;"><img alt="google" src="<?php echo $this->siteDir;?>/img/google.png" /></a>
+       <a href="#" onclick="login('twitter');return false;"><img alt="twitter" src="<?php echo $this->siteDir;?>/img/twitter.png" /></a>
+       <a href="#" onclick="login('facebook');return false;"><img alt="facebook" src="<?php echo $this->siteDir;?>/img/facebook.png" /></a>
+       <a href="#" onclick="login('vkontakte');return false;"><img alt="vkontakte" src="<?php echo $this->siteDir;?>/img/vkontakte.png" /></a>
+       <a href="#" onclick="login('mailru');return false;"><img alt="mailru" src="<?php echo $this->siteDir;?>/img/mailru.png" /></a>
+       <a href="#" onclick="login('foursquare');return false;"><img alt="foursquare" src="<?php echo $this->siteDir;?>/img/foursquare.png" /></a>
+       <a href="#" onclick="login('flickr');return false;"><img alt="flickr" src="<?php echo $this->siteDir;?>/img/flickr.png" /></a>
+       <a href="#" onclick="login('gowalla');return false;"><img alt="gowalla" src="<?php echo $this->siteDir;?>/img/gowalla.png" /></a>
     <?php else:?>
        <a href="<?php echo $this->siteDir;?>/index/logout" onclick="">Logout</a>
        <div><strong>Parameters:</strong><pre> <?php print_r($this->parameters);?></pre></div>

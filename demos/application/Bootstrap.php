@@ -72,6 +72,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             'userAuthorizationUrl' => 'http://flickr.com/services/auth/',
             'permission' => SAuth_Adapter_Flickr::PERMS_READ,
         );
+        
+        $sauthConf['gowalla'] = array(
+            'consumerSecret' => '',
+            'consumerId' => '',
+            'callbackUrl' => $siteUrl . $siteDir . '/index/auth/by/gowalla',
+        );
+        
         Zend_Registry::set('sauthConf', $sauthConf);
         
     }    

@@ -157,10 +157,14 @@ abstract class SAuth_Adapter_Abstract {
      * @param string $parameters
      * @return Zend_Http_Response
      */
-    public function httpRequest($type, $url, $parameters) {
+    public function httpRequest($type, $url, $parameters, $headers = array()) {
         
         $client = new Zend_Http_Client();
         $client->setUri($url);
+        
+        if (!empty($headers)) {
+            $client->setHeaders($headers);
+        }
         
         if ($type == Zend_Http_Client::GET) {
             
