@@ -13,6 +13,7 @@ Includes libraries for next social services:
 * Vkontakte
 * Mail.ru
 * Flickr
+* Gowalla
 
 Getting Started
 ---------------
