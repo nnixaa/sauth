@@ -98,7 +98,7 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
                 $parsedResponse = $this->parseResponseJson($response->getBody());
 
                 //try to get user data
-                $userParameters = $this->requestUserParams($parsedResponse['access_token']);
+                $userParameters = (array) $this->requestUserParams($parsedResponse['access_token']);
                 
                 $identity = $this->_prepareIdentity(array_merge($parsedResponse, $userParameters));
                 
