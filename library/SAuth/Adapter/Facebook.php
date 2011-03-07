@@ -54,7 +54,7 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
     
     /**
      * Authenticate user by facebook OAuth 2.0
-     * @return true
+     * @return Zend_Auth_Result
      */
     public function authenticate() {
         

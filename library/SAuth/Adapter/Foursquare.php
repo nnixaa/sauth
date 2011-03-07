@@ -46,7 +46,7 @@ class SAuth_Adapter_Foursquare extends SAuth_Adapter_Abstract implements Zend_Au
     
     /**
      * Authenticate user by foursquare OAuth 2.0
-     * @return true
+     * @return Zend_Auth_Result
      */
     public function authenticate() {
         

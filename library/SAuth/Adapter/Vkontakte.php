@@ -33,7 +33,7 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
     
     /**
      * Authenticate user
-     * @return true
+     * @return Zend_Auth_Result
      */
     public function authenticate() {
         

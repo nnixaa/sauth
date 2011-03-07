@@ -47,7 +47,7 @@ class SAuth_Adapter_Mailru extends SAuth_Adapter_Abstract implements Zend_Auth_A
     
     /**
      * Authenticate user by mail.ru OAuth 2.0
-     * @return true
+     * @return Zend_Auth_Result
      */
     public function authenticate() {
         

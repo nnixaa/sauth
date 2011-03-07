@@ -44,7 +44,7 @@ class SAuth_Adapter_Twitter extends SAuth_Adapter_Abstract implements Zend_Auth_
     
     /**
      * Authenticate user by twitter OAuth
-     * @return true
+     * @return Zend_Auth_Result
      */
     public function authenticate() {
         

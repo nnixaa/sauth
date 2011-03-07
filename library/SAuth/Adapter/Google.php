@@ -44,7 +44,7 @@ class SAuth_Adapter_Google extends SAuth_Adapter_Abstract implements Zend_Auth_A
     
     /**
      * Authenticate user by google OpenId
-     * @return true
+     * @return Zend_Auth_Result
      */
     public function authenticate() {
         
