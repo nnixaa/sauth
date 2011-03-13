@@ -1,5 +1,10 @@
 <?php
 
+/**  
+ * @see SAuth_Adapter_Abstract 
+ */
+require_once 'Zend/OpenId/Extension.php';
+
 class SAuth_Provider_Google_Extension extends Zend_OpenId_Extension {
     
     /**
