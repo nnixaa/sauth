@@ -79,6 +79,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             'callbackUrl' => $siteUrl . $siteDir . '/index/auth/by/gowalla',
         );
         
+        $sauthConf['github'] = array(
+            'consumerSecret' => '',
+            'consumerId' => '',
+            'callbackUrl' => $siteUrl . $siteDir . '/index/auth/by/github',
+        );
+        
         Zend_Registry::set('sauthConf', $sauthConf);
         
     }    
