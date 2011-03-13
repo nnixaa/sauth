@@ -241,6 +241,7 @@ abstract class SAuth_Adapter_Abstract {
     protected function _prepareIdentity($identity) {
         
         $identity['adapterName'] = $this->_sessionKey;
+        $identity['time'] = time();
         return $identity;
     }
 }
