@@ -14,6 +14,7 @@ Includes libraries for next social services:
 * Mail.ru
 * Flickr
 * Gowalla
+* Github
 
 Getting Started
 ---------------
