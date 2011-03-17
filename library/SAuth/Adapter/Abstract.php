@@ -237,11 +237,12 @@ abstract class SAuth_Adapter_Abstract {
     
     /**
      * Add specified parameters into identity
+     * @return array
      */
     protected function _prepareIdentity($identity) {
-        
+        $identity = (array) $identity;
         $identity['adapterName'] = $this->_sessionKey;
-        $identity['time'] = time();
+        $identity['authTime'] = time();
         return $identity;
     }
 }
