@@ -55,7 +55,7 @@
        <a href="#" onclick="login('github');return false;"><img alt="github" src="<?php echo $this->siteDir;?>/img/github.png" /></a>
     <?php else:?>
        <a href="<?php echo $this->siteDir;?>/index/logout" onclick="">Logout</a>
-       <div><strong>Parameters:</strong><pre> <?php print_r($this->parameters);?></pre></div>
+       <div><strong>Parameters:</strong><pre> <?php print_r($this->userData);?></pre></div>
     <?php endif;?>
 </body>
 </html>

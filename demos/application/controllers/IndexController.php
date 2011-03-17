@@ -23,7 +23,7 @@ class IndexController extends Zend_Controller_Action {
         if ($auth->hasIdentity()) {
                 
             $this->view->auth = true;
-            $this->view->parameters = $auth->getIdentity();
+            $this->view->userData = $auth->getIdentity();
         
         } else {
             
