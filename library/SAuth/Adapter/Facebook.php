@@ -42,7 +42,7 @@ class SAuth_Adapter_Facebook extends SAuth_Adapter_Abstract implements Zend_Auth
         'userAuthorizationUrl'  => 'http://www.facebook.com/dialog/oauth',
         'accessTokenUrl'        => 'https://graph.facebook.com/oauth/access_token',
         'requestDatarUrl'       => 'https://graph.facebook.com/me',
-        'response_type'         => self::RESPONSE_TYPE_CODE,
+        'responseType'          => self::RESPONSE_TYPE_CODE,
         'display'               => self::DISPLAY_PAGE,
         'scope'                 => array(),
     );
