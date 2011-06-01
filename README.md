@@ -1,6 +1,9 @@
 SAuth
 =====
 
+**This library is open source. Please help me by forking the project and adding to it.**
+
+
 Social authentication library for Zend Framework
 -----------------------------------------------
 
