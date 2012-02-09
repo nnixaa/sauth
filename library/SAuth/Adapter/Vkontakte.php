@@ -3,7 +3,9 @@
 /**  
  * @see SAuth_Adapter_Abstract 
  */
-require_once 'SAuth/Adapter/Abstract.php';
+require_once 'Abstract.php';
+
+/** require_once 'SAuth/Adapter/Abstract.php'; **/
 
 /**
  * @see Zend_Auth_Adapter_Interface
@@ -13,7 +15,7 @@ require_once 'Zend/Auth/Adapter/Interface.php';
 /**
  * Authentication with vkontakte
  * 
- * http://vkontakte.ru/developers.php?o=-1&p=Open+API
+ * http://vkontakte.ru/developers.php?oid=-1&p=Авторизация_сайтов
  */
 class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Auth_Adapter_Interface {
     
@@ -21,9 +23,14 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
      * @var array Configuration array
      */
     protected $_config = array(
-        'consumerId'        => '',
-        'consumerSecret'    => '',
-        'callbackUrl'       => '',
+        'consumerId'            => '',
+        'consumerSecret'        => '',
+        'callbackUrl'           => '',
+        'userAuthorizationUrl'  => 'http://api.vkontakte.ru/oauth/authorize',
+        'accessTokenUrl'        => 'https://api.vkontakte.ru/oauth/access_token',
+        'requestDatarUrl'       => 'https://graph.facebook.com/me',
+        'responseType'          => 'code',
+        'scope'                 => array(),
     );
     
     /**
@@ -39,37 +46,79 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
         
         $config = $this->getConfig();
         
-        $apiId      = $config['consumerId'];
-        $apiSecret  = $config['consumerSecret'];
+        $authorizationUrl   = $config['userAuthorizationUrl'];
+        $accessTokenUrl     = $config['accessTokenUrl'];
+        $clientId           = $config['consumerId'];
+        $clientSecret       = $config['consumerSecret'];
+        $redirectUrl        = $config['callbackUrl'];
+        $responseType       = $config['responseType'];
         
-        if (empty($apiId) || empty($apiSecret)) {
+        if (isset($_GET['code']) && !empty($_GET['code'])) {
+                
+            $accessConfig = array(
+                'client_id'     => $clientId,
+                'client_secret' => $clientSecret,
+                'code'          => trim($_GET['code']),
+            );
             
-            require_once 'Zend/Auth/Adapter/Exception.php';
-            throw new Zend_Auth_Adapter_Exception('Vkontakte auth configuration not specifed');
-        }
+            $response = $this->httpRequest('GET', $accessTokenUrl, $accessConfig);
+            
+            if ($response->isError()) {
+                //vkontakte return 400 http code on error
+                switch  ($response->getStatus()) {
+                    case '400':
+                        $parsedErrors = $this->parseResponseJson($response->getBody());
+                        $error = $parsedErrors['error']['message'];
+                        break;
+                    default:
+                        $error = 'Vkontakte Oauth service unavailable';
+                        break;
+                }
+				
+                return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
+                
+            } elseif ($response->isSuccessful()) {
 
-        $appCookie = isset($_COOKIE['vk_app_' . $apiId]) ? $this->parseResponseUrl($_COOKIE['vk_app_' . $apiId]) : null;
-        $vkUserCookie = isset($_COOKIE['vk_user_info_' . $apiId]) ? $this->parseResponseUrl($_COOKIE['vk_user_info_' . $apiId]) : null;
-        
-        if (!empty($appCookie)) {
-            //create sign
-            $sign = 'expire=' . $appCookie['expire'] . 'mid=' . $appCookie['mid'] . 'secret=' . $appCookie['secret']
-                . 'sid=' . $appCookie['sid'];
-            $sign =  md5($sign . $apiSecret);
-            
-            if ($appCookie['sig'] == $sign) {
-                
-                //unset vk info cookie
-                setcookie('vk_user_info_' . $apiId, '', time() - 1000, '/');
-                
-                $identity = $this->_prepareIdentity(array_merge($appCookie, $vkUserCookie));
+                $parsedResponse = $this->parseResponseJson($response->getBody());
+
+                /*
+				Дополнительные поля, список с обозначениями тут: 
+				http://vkontakte.ru/developers.php?oid=-1&p=Описание_полей_параметра_fields
+				*/
+				
+				$userConfig = array(
+                'uid'     => $parsedResponse['user_id'],
+                'fields' => 'photo_rec,screen_name', 
+                'access_token'  => $parsedResponse['access_token'],
+				);
+				
+                $userRequest = $this->httpRequest('GET', 'https://api.vkontakte.ru/method/getProfiles', $userConfig);
+				$userParameters = $this->parseResponseJson($userRequest->getBody());
+				
+                $identity = $this->_prepareIdentity(array_merge($parsedResponse, $userParameters['response']['0']));
                 
                 return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
+                
             }
+        } elseif (!isset($_GET['error'])) {
+            
+            $authorizationConfig = array(
+                'client_id'     => $clientId, 
+                'redirect_uri'  => $redirectUrl.'/index/auth/by/vkontakte',
+                'scope'  => 'audio',
+                'response_type' => 'code',
+            );
+            
+            $url = 'http://api.vkontakte.ru/oauth/authorize?';
+            $url .= http_build_query($authorizationConfig, null, '&');
+            header('Location: ' . $url);
+            exit(1);
+            
+        } else {
+            
+            return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($_GET['error']));
+            
         }
-
-        $error = 'Vkontakte auth failed';
-        return new Zend_Auth_Result(Zend_Auth_Result::FAILURE, false, array($error));
     }
     
 }
