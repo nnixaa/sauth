@@ -47,10 +47,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         );
         
         $sauthConf['vkontakte'] = array(
-            'consumerId' => '',
-            'consumerSecret' => '',
-            'userAuthorizationUrl' => $siteUrl . $siteDir . '/index/auth/by/vkontakte',
-            'callbackUrl' => $siteUrl . $siteDir,
+            'consumerId' => '2829653',
+            'consumerSecret' => 'ukVJVXZwBO1KdReLKEYJ',
+            'callbackUrl' => $siteUrl . $siteDir . '/index/auth/by/vkontakte',
         );
         
         $sauthConf['mailru'] = array(
