@@ -139,7 +139,7 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
             
 			$requestParams = array(
 					'access_token'	=> $accessToken,
-					'uids'			=> array($userId),
+					'uids'			=> $userId,
 			);
 			
 			$userFields = $this->getConfig('userFields');
