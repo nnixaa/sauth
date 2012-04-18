@@ -15,9 +15,6 @@ class IndexController extends Zend_Controller_Action {
     
     public function indexAction() {
         
-        $this->view->vkAppId = $this->config['vkontakte']['consumerId'];
-        $this->view->vkAuthUrl = $this->config['vkontakte']['userAuthorizationUrl'];
-        
         $auth = Zend_Auth::getInstance();
         
         if ($auth->hasIdentity()) {
@@ -60,12 +57,6 @@ class IndexController extends Zend_Controller_Action {
             $this->view->auth = false;
             $this->view->errors = $result->getMessages();
         }
-        
-        //Vkontakte based on its own auth system and it causes some problems
-        if ($adapterName == 'vkontakte') {
-            $this->getResponse()->setRedirect($this->config[$adapterName]['callbackUrl']);
-        }
-        
     }
     
     public function logoutAction() {

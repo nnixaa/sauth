@@ -4,36 +4,11 @@
     <meta charset="UTF-8">
     <!-- Google site verification-->
     <meta name="google-site-verification" content="ulechw5XJLBdsR0-4CvLMjRr3KXOT0jyLZNTEhzE80U" />
-    <!-- Vkontakte Open api-->
-    <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript"></script>
-    <script type="text/javascript">
-        VK.init({
-            apiId: <?php echo $this->vkAppId;?>
-        });
-    </script>
     <title>Social Auth</title>
     <script type="text/javascript">
         function login(by) {
             by =  by || 'google';
-            if (by == 'vkontakte') {
-                VK.Auth.login(function(response) {
-                    if (response.session) {
-                        var exdate = new Date();
-                        exdate.setMinutes(exdate.getMinutes() + 10);
-                        var user = response.session.user;
-                        var cookie = 'vk_user_info_' + <?php echo $this->vkAppId;?> +'=';
-                        for (key in user) {
-                            cookie += key + '=' + escape(user[key]) + '&';
-                        }
-                        cookie += '; expires=' + exdate.toUTCString();
-                        document.cookie = cookie;
-                        document.location = '<?php echo $this->vkAuthUrl;?>';
-                    } else {
-                    }
-                });
-            } else {
-                window.open('<?php echo $this->baseUrl();?>/index/auth/by/' + by, 'Auth', 'height=600,width=600,status=no,toolbar=no,menubar=no,location=no, resizable=no');
-            }
+            window.open('<?php echo $this->baseUrl();?>/index/auth/by/' + by, 'Auth', 'height=600,width=600,status=no,toolbar=no,menubar=no,location=no, resizable=no');
         }
     </script>
     <style type="text/css">
