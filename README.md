@@ -18,6 +18,7 @@ Includes libraries for next social services:
 * Flickr
 * Gowalla
 * Github
+* Skyrock
 
 Getting Started
 ---------------
