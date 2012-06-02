@@ -144,8 +144,8 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
 			
 			$userFields = $this->getConfig('userFields');
 			
-			if ( is_array( $userFields ) && count( $userFields ) > 0 ) {
-				$requestParams['fields'] = $userFields;
+			if ( is_array( $userFields['scope'] ) && count( $userFields['scope'] ) > 0 ) {
+				$requestParams['fields'] = $userFields['scope'];
 			}
 			
             $response = $this->httpRequest('GET', $userDataUrl, $requestParams );
