@@ -231,6 +231,7 @@ abstract class SAuth_Adapter_Abstract {
      */
     protected function _unsetTokenRequest() {
         
+        $sessionStorage = $this->getSessionStorage();
         $sessionStorage->tokenRequest = null;
         unset($sessionStorage->tokenRequest);
     }
