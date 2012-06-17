@@ -52,6 +52,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             'callbackUrl' => $siteUrl . $siteDir . '/index/auth/by/vkontakte',
         );
         
+        $sauthConf['skyrock'] = array(
+            'consumerKey' => '',
+            'consumerSecret' => '',
+            'callbackUrl' => $siteUrl . $siteDir . '/index/auth/by/skyrock',
+        );
+        
         $sauthConf['mailru'] = array(
             'consumerId' => '',
             'privateKey' => '',
