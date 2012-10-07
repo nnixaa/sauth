@@ -121,17 +121,8 @@ abstract class SAuth_Adapter_Abstract {
      * @return array|false
      */
     public function parseResponseUrl($url) {
-
         $url = (string) trim($url);
-        $pairs = explode('&', $url);
-        
-        $parsed = array();
-        foreach ($pairs as $pair) {
-            list($key, $value) = explode('=', $pair, 2);
-            if (!empty($key) && !empty($value)) {
-                $parsed[$key] = $value;
-            }
-        }
+        parse_str($url,$parsed);
         return empty($parsed) ? false : $parsed;
     }
     
