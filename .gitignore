@@ -3,3 +3,4 @@
 .idea/
 demos/application/Bootstrap.php
 library/Zend
+/nbproject/private/

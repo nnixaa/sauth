@@ -90,6 +90,16 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             'callbackUrl' => $siteUrl . $siteDir . '/index/auth/by/github',
         );
         
+        $sauthConf['linkedin'] = array(
+            'consumerKey' => '',
+            'consumerSecret' => '',
+            'callbackUrl' => $siteUrl . $siteDir . '/index/auth/by/linkedin',
+            'scope' => array(
+                 'r_fullprofile', 'r_emailaddress', 
+            ), // list of the available permissions https://developer.linkedin.com/documents/authentication#granting
+            'userFields' => array('id', 'first-name', 'last-name') // list of the available fields https://developer.linkedin.com/documents/profile-fields
+        );
+        
         Zend_Registry::set('sauthConf', $sauthConf);
         
     }    
