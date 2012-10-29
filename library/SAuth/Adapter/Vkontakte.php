@@ -73,6 +73,7 @@ class SAuth_Adapter_Vkontakte extends SAuth_Adapter_Abstract implements Zend_Aut
             $accessConfig = array(
                 'client_id'     => $clientId,
                 'client_secret' => $clientSecret,
+		'redirect_uri' => $redirectUrl,
 				'code'			=> $_GET['code'] 
             );
 		
